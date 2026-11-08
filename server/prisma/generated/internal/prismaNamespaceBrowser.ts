@@ -98,7 +98,7 @@ export const EmployeeScalarFieldEnum = {
   branchId: 'branchId',
   name: 'name',
   email: 'email',
-  passwordHash: 'passwordHash',
+  password: 'password',
   role: 'role',
   position: 'position',
   salary: 'salary',

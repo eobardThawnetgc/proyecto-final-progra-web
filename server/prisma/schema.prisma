@@ -1,7 +1,7 @@
 
 generator client {
   provider     = "prisma-client"
-  output       = "../src/generated/prisma"
+  output       = "./generated"
   moduleFormat = "esm"
 }
 
@@ -86,8 +86,8 @@ model Employee {
   id           Int      @id @default(autoincrement())
   branchId     Int
   name         String
-  email        String?  @unique
-  passwordHash String?
+  email        String  @unique
+  password     String
   role         UserRole @default(EMPLOYEE)
   position     String
   salary       Decimal  @db.Decimal(10, 2)

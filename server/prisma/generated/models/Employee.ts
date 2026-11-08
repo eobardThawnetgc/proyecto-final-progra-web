@@ -43,7 +43,7 @@ export type EmployeeMinAggregateOutputType = {
   branchId: number | null
   name: string | null
   email: string | null
-  passwordHash: string | null
+  password: string | null
   role: $Enums.UserRole | null
   position: string | null
   salary: runtime.Decimal | null
@@ -56,7 +56,7 @@ export type EmployeeMaxAggregateOutputType = {
   branchId: number | null
   name: string | null
   email: string | null
-  passwordHash: string | null
+  password: string | null
   role: $Enums.UserRole | null
   position: string | null
   salary: runtime.Decimal | null
@@ -69,7 +69,7 @@ export type EmployeeCountAggregateOutputType = {
   branchId: number
   name: number
   email: number
-  passwordHash: number
+  password: number
   role: number
   position: number
   salary: number
@@ -96,7 +96,7 @@ export type EmployeeMinAggregateInputType = {
   branchId?: true
   name?: true
   email?: true
-  passwordHash?: true
+  password?: true
   role?: true
   position?: true
   salary?: true
@@ -109,7 +109,7 @@ export type EmployeeMaxAggregateInputType = {
   branchId?: true
   name?: true
   email?: true
-  passwordHash?: true
+  password?: true
   role?: true
   position?: true
   salary?: true
@@ -122,7 +122,7 @@ export type EmployeeCountAggregateInputType = {
   branchId?: true
   name?: true
   email?: true
-  passwordHash?: true
+  password?: true
   role?: true
   position?: true
   salary?: true
@@ -221,8 +221,8 @@ export type EmployeeGroupByOutputType = {
   id: number
   branchId: number
   name: string
-  email: string | null
-  passwordHash: string | null
+  email: string
+  password: string
   role: $Enums.UserRole
   position: string
   salary: runtime.Decimal
@@ -257,8 +257,8 @@ export type EmployeeWhereInput = {
   id?: Prisma.IntFilter<"Employee"> | number
   branchId?: Prisma.IntFilter<"Employee"> | number
   name?: Prisma.StringFilter<"Employee"> | string
-  email?: Prisma.StringNullableFilter<"Employee"> | string | null
-  passwordHash?: Prisma.StringNullableFilter<"Employee"> | string | null
+  email?: Prisma.StringFilter<"Employee"> | string
+  password?: Prisma.StringFilter<"Employee"> | string
   role?: Prisma.EnumUserRoleFilter<"Employee"> | $Enums.UserRole
   position?: Prisma.StringFilter<"Employee"> | string
   salary?: Prisma.DecimalFilter<"Employee"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -274,8 +274,8 @@ export type EmployeeOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   branchId?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  email?: Prisma.SortOrderInput | Prisma.SortOrder
-  passwordHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  email?: Prisma.SortOrder
+  password?: Prisma.SortOrder
   role?: Prisma.SortOrder
   position?: Prisma.SortOrder
   salary?: Prisma.SortOrder
@@ -295,7 +295,7 @@ export type EmployeeWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.EmployeeWhereInput | Prisma.EmployeeWhereInput[]
   branchId?: Prisma.IntFilter<"Employee"> | number
   name?: Prisma.StringFilter<"Employee"> | string
-  passwordHash?: Prisma.StringNullableFilter<"Employee"> | string | null
+  password?: Prisma.StringFilter<"Employee"> | string
   role?: Prisma.EnumUserRoleFilter<"Employee"> | $Enums.UserRole
   position?: Prisma.StringFilter<"Employee"> | string
   salary?: Prisma.DecimalFilter<"Employee"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -311,8 +311,8 @@ export type EmployeeOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   branchId?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  email?: Prisma.SortOrderInput | Prisma.SortOrder
-  passwordHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  email?: Prisma.SortOrder
+  password?: Prisma.SortOrder
   role?: Prisma.SortOrder
   position?: Prisma.SortOrder
   salary?: Prisma.SortOrder
@@ -332,8 +332,8 @@ export type EmployeeScalarWhereWithAggregatesInput = {
   id?: Prisma.IntWithAggregatesFilter<"Employee"> | number
   branchId?: Prisma.IntWithAggregatesFilter<"Employee"> | number
   name?: Prisma.StringWithAggregatesFilter<"Employee"> | string
-  email?: Prisma.StringNullableWithAggregatesFilter<"Employee"> | string | null
-  passwordHash?: Prisma.StringNullableWithAggregatesFilter<"Employee"> | string | null
+  email?: Prisma.StringWithAggregatesFilter<"Employee"> | string
+  password?: Prisma.StringWithAggregatesFilter<"Employee"> | string
   role?: Prisma.EnumUserRoleWithAggregatesFilter<"Employee"> | $Enums.UserRole
   position?: Prisma.StringWithAggregatesFilter<"Employee"> | string
   salary?: Prisma.DecimalWithAggregatesFilter<"Employee"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -343,8 +343,8 @@ export type EmployeeScalarWhereWithAggregatesInput = {
 
 export type EmployeeCreateInput = {
   name: string
-  email?: string | null
-  passwordHash?: string | null
+  email: string
+  password: string
   role?: $Enums.UserRole
   position: string
   salary: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -360,8 +360,8 @@ export type EmployeeUncheckedCreateInput = {
   id?: number
   branchId: number
   name: string
-  email?: string | null
-  passwordHash?: string | null
+  email: string
+  password: string
   role?: $Enums.UserRole
   position: string
   salary: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -374,8 +374,8 @@ export type EmployeeUncheckedCreateInput = {
 
 export type EmployeeUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   position?: Prisma.StringFieldUpdateOperationsInput | string
   salary?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -391,8 +391,8 @@ export type EmployeeUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   branchId?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   position?: Prisma.StringFieldUpdateOperationsInput | string
   salary?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -407,8 +407,8 @@ export type EmployeeCreateManyInput = {
   id?: number
   branchId: number
   name: string
-  email?: string | null
-  passwordHash?: string | null
+  email: string
+  password: string
   role?: $Enums.UserRole
   position: string
   salary: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -418,8 +418,8 @@ export type EmployeeCreateManyInput = {
 
 export type EmployeeUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   position?: Prisma.StringFieldUpdateOperationsInput | string
   salary?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -431,8 +431,8 @@ export type EmployeeUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   branchId?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   position?: Prisma.StringFieldUpdateOperationsInput | string
   salary?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -455,7 +455,7 @@ export type EmployeeCountOrderByAggregateInput = {
   branchId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   email?: Prisma.SortOrder
-  passwordHash?: Prisma.SortOrder
+  password?: Prisma.SortOrder
   role?: Prisma.SortOrder
   position?: Prisma.SortOrder
   salary?: Prisma.SortOrder
@@ -474,7 +474,7 @@ export type EmployeeMaxOrderByAggregateInput = {
   branchId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   email?: Prisma.SortOrder
-  passwordHash?: Prisma.SortOrder
+  password?: Prisma.SortOrder
   role?: Prisma.SortOrder
   position?: Prisma.SortOrder
   salary?: Prisma.SortOrder
@@ -487,7 +487,7 @@ export type EmployeeMinOrderByAggregateInput = {
   branchId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   email?: Prisma.SortOrder
-  passwordHash?: Prisma.SortOrder
+  password?: Prisma.SortOrder
   role?: Prisma.SortOrder
   position?: Prisma.SortOrder
   salary?: Prisma.SortOrder
@@ -546,10 +546,6 @@ export type EmployeeUncheckedUpdateManyWithoutBranchNestedInput = {
   update?: Prisma.EmployeeUpdateWithWhereUniqueWithoutBranchInput | Prisma.EmployeeUpdateWithWhereUniqueWithoutBranchInput[]
   updateMany?: Prisma.EmployeeUpdateManyWithWhereWithoutBranchInput | Prisma.EmployeeUpdateManyWithWhereWithoutBranchInput[]
   deleteMany?: Prisma.EmployeeScalarWhereInput | Prisma.EmployeeScalarWhereInput[]
-}
-
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
 }
 
 export type EnumUserRoleFieldUpdateOperationsInput = {
@@ -616,8 +612,8 @@ export type EmployeeUpdateOneRequiredWithoutPayrollsNestedInput = {
 
 export type EmployeeCreateWithoutBranchInput = {
   name: string
-  email?: string | null
-  passwordHash?: string | null
+  email: string
+  password: string
   role?: $Enums.UserRole
   position: string
   salary: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -631,8 +627,8 @@ export type EmployeeCreateWithoutBranchInput = {
 export type EmployeeUncheckedCreateWithoutBranchInput = {
   id?: number
   name: string
-  email?: string | null
-  passwordHash?: string | null
+  email: string
+  password: string
   role?: $Enums.UserRole
   position: string
   salary: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -676,8 +672,8 @@ export type EmployeeScalarWhereInput = {
   id?: Prisma.IntFilter<"Employee"> | number
   branchId?: Prisma.IntFilter<"Employee"> | number
   name?: Prisma.StringFilter<"Employee"> | string
-  email?: Prisma.StringNullableFilter<"Employee"> | string | null
-  passwordHash?: Prisma.StringNullableFilter<"Employee"> | string | null
+  email?: Prisma.StringFilter<"Employee"> | string
+  password?: Prisma.StringFilter<"Employee"> | string
   role?: Prisma.EnumUserRoleFilter<"Employee"> | $Enums.UserRole
   position?: Prisma.StringFilter<"Employee"> | string
   salary?: Prisma.DecimalFilter<"Employee"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -687,8 +683,8 @@ export type EmployeeScalarWhereInput = {
 
 export type EmployeeCreateWithoutSalesInput = {
   name: string
-  email?: string | null
-  passwordHash?: string | null
+  email: string
+  password: string
   role?: $Enums.UserRole
   position: string
   salary: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -703,8 +699,8 @@ export type EmployeeUncheckedCreateWithoutSalesInput = {
   id?: number
   branchId: number
   name: string
-  email?: string | null
-  passwordHash?: string | null
+  email: string
+  password: string
   role?: $Enums.UserRole
   position: string
   salary: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -732,8 +728,8 @@ export type EmployeeUpdateToOneWithWhereWithoutSalesInput = {
 
 export type EmployeeUpdateWithoutSalesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   position?: Prisma.StringFieldUpdateOperationsInput | string
   salary?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -748,8 +744,8 @@ export type EmployeeUncheckedUpdateWithoutSalesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   branchId?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   position?: Prisma.StringFieldUpdateOperationsInput | string
   salary?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -761,8 +757,8 @@ export type EmployeeUncheckedUpdateWithoutSalesInput = {
 
 export type EmployeeCreateWithoutCashSessionsInput = {
   name: string
-  email?: string | null
-  passwordHash?: string | null
+  email: string
+  password: string
   role?: $Enums.UserRole
   position: string
   salary: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -777,8 +773,8 @@ export type EmployeeUncheckedCreateWithoutCashSessionsInput = {
   id?: number
   branchId: number
   name: string
-  email?: string | null
-  passwordHash?: string | null
+  email: string
+  password: string
   role?: $Enums.UserRole
   position: string
   salary: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -806,8 +802,8 @@ export type EmployeeUpdateToOneWithWhereWithoutCashSessionsInput = {
 
 export type EmployeeUpdateWithoutCashSessionsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   position?: Prisma.StringFieldUpdateOperationsInput | string
   salary?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -822,8 +818,8 @@ export type EmployeeUncheckedUpdateWithoutCashSessionsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   branchId?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   position?: Prisma.StringFieldUpdateOperationsInput | string
   salary?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -835,8 +831,8 @@ export type EmployeeUncheckedUpdateWithoutCashSessionsInput = {
 
 export type EmployeeCreateWithoutPayrollsInput = {
   name: string
-  email?: string | null
-  passwordHash?: string | null
+  email: string
+  password: string
   role?: $Enums.UserRole
   position: string
   salary: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -851,8 +847,8 @@ export type EmployeeUncheckedCreateWithoutPayrollsInput = {
   id?: number
   branchId: number
   name: string
-  email?: string | null
-  passwordHash?: string | null
+  email: string
+  password: string
   role?: $Enums.UserRole
   position: string
   salary: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -880,8 +876,8 @@ export type EmployeeUpdateToOneWithWhereWithoutPayrollsInput = {
 
 export type EmployeeUpdateWithoutPayrollsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   position?: Prisma.StringFieldUpdateOperationsInput | string
   salary?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -896,8 +892,8 @@ export type EmployeeUncheckedUpdateWithoutPayrollsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   branchId?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   position?: Prisma.StringFieldUpdateOperationsInput | string
   salary?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -910,8 +906,8 @@ export type EmployeeUncheckedUpdateWithoutPayrollsInput = {
 export type EmployeeCreateManyBranchInput = {
   id?: number
   name: string
-  email?: string | null
-  passwordHash?: string | null
+  email: string
+  password: string
   role?: $Enums.UserRole
   position: string
   salary: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -921,8 +917,8 @@ export type EmployeeCreateManyBranchInput = {
 
 export type EmployeeUpdateWithoutBranchInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   position?: Prisma.StringFieldUpdateOperationsInput | string
   salary?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -936,8 +932,8 @@ export type EmployeeUpdateWithoutBranchInput = {
 export type EmployeeUncheckedUpdateWithoutBranchInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   position?: Prisma.StringFieldUpdateOperationsInput | string
   salary?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -951,8 +947,8 @@ export type EmployeeUncheckedUpdateWithoutBranchInput = {
 export type EmployeeUncheckedUpdateManyWithoutBranchInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   position?: Prisma.StringFieldUpdateOperationsInput | string
   salary?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1014,7 +1010,7 @@ export type EmployeeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   branchId?: boolean
   name?: boolean
   email?: boolean
-  passwordHash?: boolean
+  password?: boolean
   role?: boolean
   position?: boolean
   salary?: boolean
@@ -1032,7 +1028,7 @@ export type EmployeeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   branchId?: boolean
   name?: boolean
   email?: boolean
-  passwordHash?: boolean
+  password?: boolean
   role?: boolean
   position?: boolean
   salary?: boolean
@@ -1046,7 +1042,7 @@ export type EmployeeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   branchId?: boolean
   name?: boolean
   email?: boolean
-  passwordHash?: boolean
+  password?: boolean
   role?: boolean
   position?: boolean
   salary?: boolean
@@ -1060,7 +1056,7 @@ export type EmployeeSelectScalar = {
   branchId?: boolean
   name?: boolean
   email?: boolean
-  passwordHash?: boolean
+  password?: boolean
   role?: boolean
   position?: boolean
   salary?: boolean
@@ -1068,7 +1064,7 @@ export type EmployeeSelectScalar = {
   active?: boolean
 }
 
-export type EmployeeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "branchId" | "name" | "email" | "passwordHash" | "role" | "position" | "salary" | "hireDate" | "active", ExtArgs["result"]["employee"]>
+export type EmployeeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "branchId" | "name" | "email" | "password" | "role" | "position" | "salary" | "hireDate" | "active", ExtArgs["result"]["employee"]>
 export type EmployeeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
   sales?: boolean | Prisma.Employee$salesArgs<ExtArgs>
@@ -1095,8 +1091,8 @@ export type $EmployeePayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     id: number
     branchId: number
     name: string
-    email: string | null
-    passwordHash: string | null
+    email: string
+    password: string
     role: $Enums.UserRole
     position: string
     salary: runtime.Decimal
@@ -1533,7 +1529,7 @@ export interface EmployeeFieldRefs {
   readonly branchId: Prisma.FieldRef<"Employee", 'Int'>
   readonly name: Prisma.FieldRef<"Employee", 'String'>
   readonly email: Prisma.FieldRef<"Employee", 'String'>
-  readonly passwordHash: Prisma.FieldRef<"Employee", 'String'>
+  readonly password: Prisma.FieldRef<"Employee", 'String'>
   readonly role: Prisma.FieldRef<"Employee", 'UserRole'>
   readonly position: Prisma.FieldRef<"Employee", 'String'>
   readonly salary: Prisma.FieldRef<"Employee", 'Decimal'>
