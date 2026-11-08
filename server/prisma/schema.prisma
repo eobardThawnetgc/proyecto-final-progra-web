@@ -1,0 +1,299 @@
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── ENUMS ───
+
+// Roles básicos de acceso al sistema.
+enum UserRole {
+  ADMIN
+  MANAGER
+  CASHIER
+  EMPLOYEE
+}
+
+// Diferencia productos preparados de productos para reventa.
+enum ProductType {
+  PREPARED
+  PACKAGED
+}
+
+// Clasificación de ingredientes e insumos del inventario.
+enum InventoryType {
+  RAW_MATERIAL
+  SUPPLY
+  PACKAGED
+}
+
+// Tipos de documentos de venta.
+enum DocumentType {
+  CONSUMER
+  CCF
+}
+
+// Métodos de pago permitidos en el POS.
+enum PaymentMethod {
+  CASH
+  CARD
+  DIGITAL
+  BITCOIN
+  CHIVO_WALLET
+}
+
+// Estado de pago de una compra a proveedor.
+enum PurchaseStatus {
+  PENDING
+  PARTIAL
+  PAID
+}
+
+// Estado de una sesión de caja.
+enum CashStatus {
+  OPEN
+  CLOSED
+}
+
+// ─── 1. SUCURSALES ───
+
+model Branch {
+  id                  Int    @id @default(autoincrement())
+  name                String
+  address             String
+
+  // Últimos correlativos utilizados por tipo de documento.
+  lastConsumerInvoice Int    @default(0)
+  lastCcf             Int    @default(0)
+
+  employees    Employee[]
+  products     Product[]
+  inventory    InventoryItem[]
+  purchases    Purchase[]
+  sales        Sale[]
+  cashSessions CashSession[]
+  payrolls     Payroll[]
+}
+
+// ─── 2. EMPLEADOS Y USUARIOS ───
+
+model Employee {
+  id           Int      @id @default(autoincrement())
+  branchId     Int
+  name         String
+  email        String?  @unique
+  passwordHash String?
+  role         UserRole @default(EMPLOYEE)
+  position     String
+  salary       Decimal  @db.Decimal(10, 2)
+  hireDate     DateTime @default(now())
+  active       Boolean  @default(true)
+
+  // Cada empleado pertenece a una sucursal.
+  // passwordHash almacena el hash, nunca la contraseña original.
+  branch       Branch       @relation(fields: [branchId], references: [id])
+  sales        Sale[]
+  cashSessions CashSession[]
+  payrolls     Payroll[]
+}
+
+// ─── 3. PRODUCTOS DEL MENÚ ───
+
+model Product {
+  id          Int         @id @default(autoincrement())
+  branchId    Int
+  name        String
+  description String?
+  type        ProductType
+  price       Decimal     @db.Decimal(10, 2)
+  active      Boolean     @default(true)
+
+  // Productos preparados utilizan recetas.
+  // Los empacados se vinculan con su existencia en inventario.
+  branch        Branch       @relation(fields: [branchId], references: [id])
+  recipeItems   RecipeItem[]
+  saleDetails   SaleDetail[]
+  inventoryItem InventoryItem?
+}
+
+// ─── 4. INVENTARIO ───
+
+model InventoryItem {
+  id           Int           @id @default(autoincrement())
+  branchId     Int
+  productId    Int?          @unique
+  name         String
+  type         InventoryType
+  unit         String
+  quantity     Decimal       @default(0) @db.Decimal(12, 3)
+  minimumStock Decimal       @default(0) @db.Decimal(12, 3)
+
+  // Existencias y mínimo de inventario por sucursal.
+  // productId se utiliza para vincular productos empacados.
+  branch          Branch          @relation(fields: [branchId], references: [id])
+  product         Product?        @relation(fields: [productId], references: [id])
+  recipeItems     RecipeItem[]
+  purchaseDetails PurchaseDetail[]
+}
+
+// ─── 5. RECETAS ───
+
+model RecipeItem {
+  productId       Int
+  inventoryItemId Int
+  quantity        Decimal @db.Decimal(12, 3)
+
+  // Indica cuánto ingrediente necesita cada producto preparado.
+  product       Product       @relation(fields: [productId], references: [id])
+  inventoryItem InventoryItem @relation(fields: [inventoryItemId], references: [id])
+
+  @@id([productId, inventoryItemId])
+}
+
+// ─── 6. PROVEEDORES ───
+
+model Supplier {
+  id      Int     @id @default(autoincrement())
+  name    String
+  phone   String?
+  email   String?
+  address String?
+
+  purchases Purchase[]
+}
+
+// ─── 7. COMPRAS ───
+
+model Purchase {
+  id            Int            @id @default(autoincrement())
+  branchId      Int
+  supplierId    Int
+  invoiceNumber String
+  date          DateTime       @default(now())
+  total         Decimal        @db.Decimal(12, 2)
+  paidAmount    Decimal        @default(0) @db.Decimal(12, 2)
+  status        PurchaseStatus @default(PENDING)
+
+  // paidAmount permite calcular el saldo pendiente al proveedor.
+  branch   Branch          @relation(fields: [branchId], references: [id])
+  supplier Supplier        @relation(fields: [supplierId], references: [id])
+  details  PurchaseDetail[]
+}
+
+// ─── 8. DETALLES DE COMPRAS ───
+
+model PurchaseDetail {
+  id              Int      @id @default(autoincrement())
+  purchaseId      Int
+  inventoryItemId Int?
+  description     String
+  quantity        Decimal  @db.Decimal(12, 3)
+  unitCost        Decimal  @db.Decimal(10, 2)
+  subtotal        Decimal  @db.Decimal(12, 2)
+
+  // inventoryItemId puede ser nulo para registrar gastos
+  // que no representan una entrada de inventario.
+  purchase      Purchase       @relation(fields: [purchaseId], references: [id])
+  inventoryItem InventoryItem? @relation(fields: [inventoryItemId], references: [id])
+}
+
+// ─── 9. VENTAS Y FACTURACIÓN ───
+
+model Sale {
+  id             Int          @id @default(autoincrement())
+  branchId       Int
+  employeeId     Int
+  cashSessionId  Int?
+  documentType   DocumentType
+  documentNumber Int
+  date           DateTime     @default(now())
+  subtotal       Decimal      @db.Decimal(12, 2)
+  tax            Decimal      @db.Decimal(12, 2)
+  total          Decimal      @db.Decimal(12, 2)
+
+  // Una venta puede tener varios pagos y métodos diferentes.
+  branch      Branch       @relation(fields: [branchId], references: [id])
+  employee    Employee     @relation(fields: [employeeId], references: [id])
+  cashSession CashSession? @relation(fields: [cashSessionId], references: [id])
+  details     SaleDetail[]
+  payments    Payment[]
+
+  // Evita repetir un correlativo dentro de una sucursal
+  // y un tipo de documento.
+  @@unique([branchId, documentType, documentNumber])
+}
+
+// ─── 10. DETALLES DE VENTAS ───
+
+model SaleDetail {
+  id        Int     @id @default(autoincrement())
+  saleId    Int
+  productId Int
+  quantity  Decimal @db.Decimal(12, 3)
+  unitPrice Decimal @db.Decimal(10, 2)
+  subtotal  Decimal @db.Decimal(12, 2)
+
+  // Conserva el precio aplicado al momento de la venta.
+  sale    Sale    @relation(fields: [saleId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+}
+
+// ─── 11. PAGOS ───
+
+model Payment {
+  id     Int           @id @default(autoincrement())
+  saleId Int
+  method PaymentMethod
+  amount Decimal       @db.Decimal(12, 2)
+
+  // Permite dividir una venta entre efectivo, tarjeta
+  // y pagos digitales, incluyendo Bitcoin y Chivo Wallet.
+  sale Sale @relation(fields: [saleId], references: [id])
+}
+
+// ─── 12. CAJA ───
+
+model CashSession {
+  id            Int        @id @default(autoincrement())
+  branchId      Int
+  employeeId    Int
+  openingAmount Decimal    @db.Decimal(12, 2)
+  closingAmount Decimal?   @db.Decimal(12, 2)
+  openedAt      DateTime   @default(now())
+  closedAt      DateTime?
+  status        CashStatus @default(OPEN)
+
+  // closingAmount representa el efectivo contado físicamente.
+  // Los demás métodos se cuadran a partir de los pagos registrados.
+  branch   Branch    @relation(fields: [branchId], references: [id])
+  employee Employee  @relation(fields: [employeeId], references: [id])
+  sales    Sale[]
+}
+
+// ─── 13. PLANILLA ───
+
+model Payroll {
+  id          Int      @id @default(autoincrement())
+  branchId    Int
+  employeeId  Int
+  periodStart DateTime
+  periodEnd   DateTime
+  grossSalary Decimal  @db.Decimal(10, 2)
+  isss        Decimal  @db.Decimal(10, 2)
+  afp         Decimal  @db.Decimal(10, 2)
+  incomeTax   Decimal  @db.Decimal(10, 2)
+  netSalary   Decimal  @db.Decimal(10, 2)
+  createdAt   DateTime @default(now())
+
+  // Registra el resultado de la planilla de cada empleado
+  // para un período determinado.
+  branch   Branch   @relation(fields: [branchId], references: [id])
+  employee Employee @relation(fields: [employeeId], references: [id])
+
+  @@unique([employeeId, periodStart, periodEnd])
+}
