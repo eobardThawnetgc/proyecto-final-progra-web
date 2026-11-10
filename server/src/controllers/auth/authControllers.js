@@ -1,5 +1,5 @@
 import { registerSchema, loginSchema } from "../../utils/validators/authValidator.js";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import prisma from "../../../config/prisma.js";
 import { generateToken } from "../../utils/jwt.js";
 
