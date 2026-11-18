@@ -6,15 +6,19 @@ import { useAuth } from '../context/auth-context.js'
 export default function Login() {
   const { employee, login } = useAuth()
   const navigate = useNavigate()
+  //Manejo del estado local
   const [form, setForm] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
+  //Si el usuario ya ha iniciado sesión, el componente lo redirige automáticamente a la página de inventario
   if (employee) return <Navigate to="/inventario" replace />
 
+  //Actualizacion de campos
   const handleChange = (event) =>
     setForm({ ...form, [event.target.name]: event.target.value })
 
+  //Envio del formulario
   const handleSubmit = async (event) => {
     event.preventDefault()
     try {
