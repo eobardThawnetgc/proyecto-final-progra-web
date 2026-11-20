@@ -1,0 +1,171 @@
+
+.error-page {
+  min-height: 100vh;
+  background: #F3EFE6;
+  color: #28392E;
+  padding: 35px 7%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.error-header,
+.error-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.error-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.error-brand-icon {
+  width: 42px;
+  height: 42px;
+  background: #344C3B;
+  color: #F3EFE6;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  font-size: 21px;
+}
+
+.error-brand h2 {
+  font-size: 16px;
+  letter-spacing: 2px;
+  margin: 0;
+  font-weight: 700;
+}
+
+.error-brand span,
+.error-code-label,
+.error-footer {
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: #77766C;
+}
+
+.error-content {
+  width: 100%;
+  max-width: 570px;
+  margin: 70px auto;
+}
+
+.error-number {
+  color: #A66C4E;
+  font-size: clamp(76px, 12vw, 120px);
+  font-weight: 300;
+  letter-spacing: -8px;
+  line-height: 1;
+}
+
+.error-content h1 {
+  font-size: clamp(32px, 5vw, 49px);
+  line-height: 1.15;
+  letter-spacing: -1.8px;
+  font-weight: 500;
+  margin: 20px 0;
+}
+
+.error-description {
+  max-width: 430px;
+  color: #77766C;
+  line-height: 1.8;
+  font-size: 15px;
+}
+
+.error-message {
+  margin-top: 38px;
+  padding: 25px;
+  background: #E6DFD1;
+  border-radius: 12px;
+}
+
+.error-message i {
+  font-size: 25px;
+  color: #80634D;
+  display: block;
+  margin-bottom: 15px;
+}
+
+.error-message span {
+  color: #80634D;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+}
+
+.error-message h3 {
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 23px;
+  font-weight: 400;
+  margin: 12px 0 0;
+  color: #344C3B;
+}
+
+.error-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-top: 28px;
+}
+
+.error-button {
+  background: #344C3B;
+  color: white;
+  border: none;
+  padding: 13px 20px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.error-button:hover {
+  background: #24392B;
+}
+
+.error-back {
+  background: transparent;
+  border: none;
+  color: #77766C;
+  cursor: pointer;
+}
+
+.error-back:hover {
+  color: #344C3B;
+}
+
+.error-footer {
+  border-top: 1px solid #D8D0C1;
+  padding-top: 20px;
+}
+
+@media (max-width: 600px) {
+  .error-page {
+    padding: 25px 6%;
+  }
+
+  .error-code-label {
+    font-size: 9px;
+  }
+
+  .error-content {
+    margin: 65px auto;
+  }
+
+  .error-actions {
+    flex-wrap: wrap;
+  }
+
+  .error-footer {
+    gap: 15px;
+    font-size: 8px;
+  }
+}
