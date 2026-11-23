@@ -2,12 +2,12 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 import LoginBrand from "./components/loginBrand";
-import LoginForm from "./components/LoginForm";
-import LoginDecoration from "./components/LoginDecoration";
+import LoginForm from "./components/loginForm";
+import LoginDecoration from "./components/loginDecoration";
 import { login } from "../../services/authService";
 import { loginSchema } from "./validators/loginValidator";
 
-import "./components/Login.css";
+import "./components/login.css";
 
 const LoginPage = () => {
 
