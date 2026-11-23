@@ -11,7 +11,8 @@ import {
   calcularSalarioBrutoQuincenal,
   calcularISSSQuincenal,
   calcularAFPQuincenal,
-  calcularISRQuincenal
+  calcularISRQuincenal,
+  calcularSalarioNetoQuincenal
 } from "./payrollCalculator.js";
 
 // Comprueba el cálculo de la primera quincena.
@@ -129,5 +130,61 @@ test("Respeta los límites de los tramos de ISR", () => {
 test("Rechaza bases gravadas negativas", () => {
   assert.throws(() => {
     calcularISRQuincenal(-100);
+  });
+});
+
+// Verifica el salario neto quincenal de un empleado que gana $800.
+test("Calcula el salario neto quincenal correctamente", () => {
+  const resultado = calcularSalarioNetoQuincenal(800, 1);
+
+  assert.equal(resultado.salarioBruto, 400);
+  assert.equal(resultado.isss, 12);
+  assert.equal(resultado.afp, 29);
+  assert.equal(resultado.baseGravada, 359);
+  assert.equal(resultado.isr, 17.23);
+  assert.equal(resultado.salarioNeto, 341.77);
+});
+
+// Comprueba que no se descuente ISR cuando no corresponde.
+test("Calcula salario neto sin retencion de ISR", () => {
+  const resultado = calcularSalarioNetoQuincenal(500, 1);
+
+  assert.equal(resultado.isr, 0);
+  assert.equal(resultado.salarioNeto, 224.38);
+});
+
+// Verifica que los descuentos y el salario neto cuadren.
+test("Conserva los centavos en el calculo del salario neto", () => {
+  const primera = calcularSalarioNetoQuincenal(1000.10, 1);
+  const segunda = calcularSalarioNetoQuincenal(1000.10, 2);
+
+  const totalBruto = primera.salarioBruto + segunda.salarioBruto;
+  const totalAFP = primera.afp + segunda.afp;
+
+  assert.equal(Math.round(totalBruto * 100), 100010);
+  assert.equal(Math.round(totalAFP * 100), 7251);
+
+  // Comprobamos que el detalle de ambas planillas sea correcto.
+  for (const planilla of [primera, segunda]) {
+    const total = planilla.salarioBruto
+      - planilla.isss
+      - planilla.afp
+      - planilla.isr;
+
+    assert.equal(
+      Math.round(total * 100),
+      Math.round(planilla.salarioNeto * 100)
+    );
+  }
+});
+
+// Verifica que no se acepten salarios o quincenas inválidas.
+test("Rechaza datos incorrectos al calcular salario neto", () => {
+  assert.throws(() => {
+    calcularSalarioNetoQuincenal(-800, 1);
+  });
+
+  assert.throws(() => {
+    calcularSalarioNetoQuincenal(800, 3);
   });
 });
