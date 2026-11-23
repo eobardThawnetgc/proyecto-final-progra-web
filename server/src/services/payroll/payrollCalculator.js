@@ -132,4 +132,43 @@ export function calcularISRQuincenal(baseGravada) {
   return impuestoCentavos / 100;
 }
 
+// Calcula el salario neto quincenal aplicando ISSS, AFP e ISR.
+export function calcularSalarioNetoQuincenal(salarioMensual, numeroQuincena) {
+
+  // Obtenemos el salario bruto y los descuentos legales.
+  const salarioBruto = calcularSalarioBrutoQuincenal(
+    salarioMensual, numeroQuincena
+  );
+
+  const isss = calcularISSSQuincenal(salarioMensual, numeroQuincena);
+  const afp = calcularAFPQuincenal(salarioMensual, numeroQuincena);
+
+  // Calculamos la base gravada después de ISSS y AFP.
+  const brutoCentavos = Math.round(salarioBruto * 100);
+  const isssCentavos = Math.round(isss * 100);
+  const afpCentavos = Math.round(afp * 100);
+
+  const baseGravadaCentavos = Math.max(
+    0, brutoCentavos - isssCentavos - afpCentavos
+  );
+
+  const baseGravada = baseGravadaCentavos / 100;
+  const isr = calcularISRQuincenal(baseGravada);
+
+  // Calculamos el salario neto evitando errores con decimales.
+  const salarioNeto =
+    (baseGravadaCentavos - Math.round(isr * 100)) / 100;
+
+  // Devolvemos el detalle que se mostrará en la planilla.
+  return {
+    salarioBruto,
+    isss,
+    afp,
+    baseGravada,
+    isr,
+    salarioNeto
+  };
+}
+
+
 
