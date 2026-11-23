@@ -83,3 +83,53 @@ export function calcularAFPQuincenal(salarioMensual, numeroQuincena) {
   );
 }
 
+/**
+ * Calcula el ISR quincenal según la tabla de retención
+ * del Decreto Ejecutivo N.º 10 de El Salvador.
+ * Recibe el salario gravado después de ISSS y AFP.
+ */
+export function calcularISRQuincenal(baseGravada) {
+  const base = Number(baseGravada);
+
+  // Validamos que el monto recibido sea correcto.
+  if (!Number.isFinite(base) || base < 0) {
+    throw new Error("La base gravada debe ser un número válido");
+  }
+
+  // Convertimos a centavos para evitar errores decimales.
+  const centavos = Math.round(base * 100);
+
+  // Primer tramo: sin retención de renta.
+  if (centavos <= 27500) {
+    return 0;
+  }
+
+  let porcentaje;
+  let excesoCentavos;
+  let cuotaFijaCentavos;
+
+  // Identificamos el tramo correspondiente.
+  if (centavos <= 44762) {
+    porcentaje = 0.10;
+    excesoCentavos = 27500;
+    cuotaFijaCentavos = 883;
+  } else if (centavos <= 101905) {
+    porcentaje = 0.20;
+    excesoCentavos = 44762;
+    cuotaFijaCentavos = 3000;
+  } else {
+    porcentaje = 0.30;
+    excesoCentavos = 101905;
+    cuotaFijaCentavos = 14428;
+  }
+
+  // Aplicamos el porcentaje sobre el exceso y sumamos la cuota fija.
+  const impuestoCentavos = Math.round(
+    (centavos - excesoCentavos) * porcentaje +
+    cuotaFijaCentavos
+  );
+
+  return impuestoCentavos / 100;
+}
+
+

@@ -10,7 +10,8 @@ import assert from "node:assert/strict";
 import {
   calcularSalarioBrutoQuincenal,
   calcularISSSQuincenal,
-  calcularAFPQuincenal
+  calcularAFPQuincenal,
+  calcularISRQuincenal
 } from "./payrollCalculator.js";
 
 // Comprueba el cálculo de la primera quincena.
@@ -95,4 +96,38 @@ test("Conserva los centavos del ISSS mensual", () => {
 
   // Comparamos en centavos para evitar errores de precisión.
   assert.equal(Math.round((primera + segunda) * 100), 2403);
+});
+
+// Verifica que los salarios gravados hasta $275 no paguen ISR.
+test("No aplica ISR en el primer tramo", () => {
+  assert.equal(calcularISRQuincenal(275), 0);
+});
+
+// Comprueba el cálculo del segundo tramo.
+test("Calcula ISR del segundo tramo", () => {
+  assert.equal(calcularISRQuincenal(359), 17.23);
+});
+
+// Comprueba el cálculo del tercer tramo.
+test("Calcula ISR del tercer tramo", () => {
+  assert.equal(calcularISRQuincenal(500), 40.48);
+});
+
+// Comprueba el cálculo del cuarto tramo.
+test("Calcula ISR del cuarto tramo", () => {
+  assert.equal(calcularISRQuincenal(1200), 198.57);
+});
+
+// Verifica los límites de los tramos de retención.
+test("Respeta los límites de los tramos de ISR", () => {
+  assert.equal(calcularISRQuincenal(275.01), 8.83);
+  assert.equal(calcularISRQuincenal(447.63), 30);
+  assert.equal(calcularISRQuincenal(1019.06), 144.28);
+});
+
+// Verifica que no se permitan bases gravadas negativas.
+test("Rechaza bases gravadas negativas", () => {
+  assert.throws(() => {
+    calcularISRQuincenal(-100);
+  });
 });
