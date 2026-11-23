@@ -32,3 +32,54 @@ export function calcularSalarioBrutoQuincenal(salarioMensual, numeroQuincena) {
   // Devolvemos el salario quincenal en dólares.
   return centavosQuincenales / 100;
 }
+/**
+ * Calcula un descuento quincenal a partir del salario mensual.
+ * Divide el descuento en dos partes sin perder centavos.
+ */
+function calcularDescuentoQuincenal(
+  salarioMensual,
+  numeroQuincena,
+  porcentaje,
+  topeMensual = Infinity
+) {
+  const salario = Number(salarioMensual);
+
+  // Reutilizamos las validaciones de salario y quincena.
+  calcularSalarioBrutoQuincenal(salario, numeroQuincena);
+
+  // Calculamos el descuento mensual respetando el tope.
+  const baseCotizable = Math.min(salario, topeMensual);
+  const centavosMensuales = Math.round(
+    baseCotizable * porcentaje * 100
+  );
+
+  // Distribuimos los centavos entre ambas quincenas.
+  const primeraQuincena = Math.floor(centavosMensuales / 2);
+
+  const centavosQuincenales =
+    numeroQuincena === 1
+      ? primeraQuincena
+      : centavosMensuales - primeraQuincena;
+
+  return centavosQuincenales / 100;
+}
+
+// Calcula el ISSS del empleado (3%, con tope mensual de $1,000).
+export function calcularISSSQuincenal(salarioMensual, numeroQuincena) {
+  return calcularDescuentoQuincenal(
+    salarioMensual,
+    numeroQuincena,
+    0.03,
+    1000
+  );
+}
+
+// Calcula el AFP del empleado (7.25% del salario cotizable).
+export function calcularAFPQuincenal(salarioMensual, numeroQuincena) {
+  return calcularDescuentoQuincenal(
+    salarioMensual,
+    numeroQuincena,
+    0.0725
+  );
+}
+
