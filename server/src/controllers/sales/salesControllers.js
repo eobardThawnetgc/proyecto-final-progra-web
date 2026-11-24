@@ -1,5 +1,20 @@
 import prisma from "../../../config/prisma.js";
 
+export const getPosProducts = async (req, res, next) => {
+  try {
+    const products = await prisma.product.findMany({
+      orderBy: { name: "asc" },
+    });
+
+    return res.status(200).json({
+      ok: true,
+      data: products,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getSales = async (req, res, next) => {
   try {
     const sales = await prisma.sale.findMany({
