@@ -18,6 +18,16 @@
     margin-right: .45rem;
 }
 
+.purchases-cash-link {
+    color: #fffefa;
+    text-decoration: none;
+}
+
+.purchases-cash-link:hover {
+    color: #dce9dc;
+    text-decoration: underline;
+}
+
 .purchase-title {
     font-family: Georgia, serif;
     font-size: clamp(1.9rem, 4vw, 2.75rem);
