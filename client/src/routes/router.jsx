@@ -13,6 +13,20 @@ export const AppRouter = createBrowserRouter([
         loader: () => redirect("/compras"),
     },
     {
+        path: "/ventas",
+        loader: async () => {
+            try {
+                const { employee } = await getCurrentUser();
+                return { employee };
+            } catch (error) {
+                if (error.status === 401) return redirect("/auth/login");
+                throw error;
+            }
+        },
+        lazy: async () => ({ Component: (await import("../pages/PosPage.jsx")).default }),
+        errorElement: <ErrorPage />,
+    },
+    {
         path: "/compras",
         loader: async () => {
             try {
