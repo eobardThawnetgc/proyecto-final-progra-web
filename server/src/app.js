@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import authRouter from "./routes/authRouter.js";
 import inventoryRouter from "./routes/inventoryRouter.js";
 import purchasesRouter from "./routes/purchasesRouter.js";
+import salesRouter from "./routes/salesRouter.js";
 import { errorMiddleware } from "./middleware/errorMiddleware.js";
 
 const app = express();
@@ -20,6 +21,7 @@ app.use(cookieParser());
 app.use("/api/auth", authRouter);
 app.use("/api/inventory", inventoryRouter);
 app.use("/api/purchases", purchasesRouter);
+app.use("/api/sales", salesRouter);
 
 // Ruta de comprobación
 app.get("/api/health", (req, res) => {
