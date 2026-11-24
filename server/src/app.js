@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import authRouter from "./routes/authRouter.js";
 import inventoryRouter from "./routes/inventoryRouter.js";
 import { errorMiddleware } from "./middleware/errorMiddleware.js";
+import payrollRouter from "./routes/payrollRouter.js";
 
 const app = express();
 
@@ -18,6 +19,9 @@ app.use(express.json());
 app.use(cookieParser());
 app.use("/api/auth", authRouter);
 app.use("/api/inventory", inventoryRouter);
+// Rutas del módulo de Nómina.
+app.use("/api/payroll", payrollRouter);
+
 
 // Ruta de comprobación
 app.get("/api/health", (req, res) => {
