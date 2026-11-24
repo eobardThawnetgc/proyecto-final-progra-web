@@ -1,0 +1,64 @@
+.employees-page {
+    min-height: 100vh;
+    background: #f3efe6;
+    color: #28392e;
+}
+
+.employees-header {
+    background: #344c3b;
+    min-height: 76px;
+}
+
+.employees-eyebrow {
+    color: #71836d;
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+}
+
+.employees-title {
+    font-family: Georgia, serif;
+    font-size: clamp(2rem, 4vw, 2.8rem);
+}
+
+.employees-stat,
+.employees-card {
+    border-color: #e4dfd4;
+    border-radius: .85rem;
+    background: #fffefa;
+}
+
+.employees-stat-icon {
+    color: #82927a;
+    font-size: 1.8rem;
+}
+
+.employees-primary.btn {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: #344c3b;
+    --bs-btn-border-color: #344c3b;
+    --bs-btn-hover-bg: #24392b;
+    --bs-btn-hover-border-color: #24392b;
+}
+
+.employees-search {
+    max-width: 28rem;
+}
+
+.employees-filter {
+    width: auto;
+    min-width: 11rem;
+}
+
+.employees-table {
+    --bs-table-bg: #fffefa;
+}
+
+.employees-table thead {
+    --bs-table-bg: #f8f5ee;
+    white-space: nowrap;
+}
+
+.employees-table :is(th, td) {
+    padding: .85rem 1rem;
+}

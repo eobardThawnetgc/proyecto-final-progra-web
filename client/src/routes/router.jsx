@@ -5,6 +5,7 @@ import AuthLayout from "../layout/authLayout";
 import LoginPage from "../pages/auth/login";
 import { getCurrentUser } from "../services/authService.js";
 import { purchasesService } from "../services/purchasesService.js";
+import { employeesService } from "../services/employeesService.js";
 
 
 export const AppRouter = createBrowserRouter([
@@ -29,6 +30,24 @@ export const AppRouter = createBrowserRouter([
             }
         },
         lazy: async () => ({ Component: (await import("../pages/PurchasesPage.jsx")).default }),
+        errorElement: <ErrorPage />,
+    },
+    {
+        path: "/recursos-humanos",
+        loader: async () => {
+            try {
+                const { employee } = await getCurrentUser();
+                if (!['ADMIN', 'MANAGER'].includes(employee.role)) return redirect("/compras");
+                const [{ employees: initialEmployees }, { branches }] = await Promise.all([
+                    employeesService.list(), employeesService.branches(),
+                ]);
+                return { employee, initialEmployees, branches };
+            } catch (error) {
+                if (error.status === 401) return redirect("/auth/login");
+                throw error;
+            }
+        },
+        lazy: async () => ({ Component: (await import("../pages/EmployeesPage.jsx")).default }),
         errorElement: <ErrorPage />,
     },
     {
