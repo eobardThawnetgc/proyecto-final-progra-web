@@ -211,6 +211,9 @@ model Sale {
   cashSessionId  Int?
   documentType   DocumentType
   documentNumber Int
+  customerName   String?
+  customerNit    String?
+  customerNrc    String?
   date           DateTime     @default(now())
   subtotal       Decimal      @db.Decimal(12, 2)
   tax            Decimal      @db.Decimal(12, 2)

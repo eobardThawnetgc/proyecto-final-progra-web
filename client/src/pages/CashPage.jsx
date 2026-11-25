@@ -107,6 +107,7 @@ export default function CashPage() {
                 <Container className="d-flex flex-wrap align-items-center justify-content-between gap-3 py-3">
                     <span className="cash-brand"><i className="bi bi-cup-hot" aria-hidden="true" /> Orígenes SV</span>
                     <div className="d-flex flex-wrap align-items-center gap-3">
+                        <Link className="cash-header-link" to="/facturacion">Facturación</Link>
                         {canSeePurchases && <Link className="cash-header-link" to="/compras">Compras</Link>}
                         <span>{employee.name}</span>
                         <Button outline color="light" size="sm" onClick={signOut}>Cerrar sesión</Button>

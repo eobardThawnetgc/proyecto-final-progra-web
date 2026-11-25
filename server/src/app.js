@@ -5,6 +5,7 @@ import authRouter from "./routes/authRouter.js";
 import inventoryRouter from "./routes/inventoryRouter.js";
 import purchasesRouter from "./routes/purchasesRouter.js";
 import cashRouter from "./routes/cashRouter.js";
+import billingRouter from "./routes/billingRouter.js";
 import { errorMiddleware } from "./middleware/errorMiddleware.js";
 
 const app = express();
@@ -22,6 +23,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/inventory", inventoryRouter);
 app.use("/api/purchases", purchasesRouter);
 app.use("/api/cash", cashRouter);
+app.use("/api/billing", billingRouter);
 
 // Ruta de comprobación
 app.get("/api/health", (req, res) => {
