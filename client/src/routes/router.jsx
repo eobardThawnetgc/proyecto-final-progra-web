@@ -1,5 +1,6 @@
 import { createBrowserRouter, redirect } from "react-router-dom";
 import ErrorPage from "../pages/error/errorPage";
+import { payrollService } from "../services/payrollService.js";
 
 import AuthLayout from "../layout/authLayout";
 import LoginPage from "../pages/auth/login";
@@ -74,6 +75,41 @@ export const AppRouter = createBrowserRouter([
         lazy: async () => ({ Component: (await import("../pages/EmployeesPage.jsx")).default }),
       errorElement: <ErrorPage />,
       },
+
+    // Ruta del módulo de Nómina.
+    {
+        path: "/nomina",
+        loader: async () => {
+            try {
+                const { employee } = await getCurrentUser();
+
+                // Solo administradores y gerentes pueden acceder.
+                if (!["ADMIN", "MANAGER"].includes(employee.role)) {
+                    return redirect("/compras");
+                }
+
+                // Cargamos los empleados y las planillas registradas.
+                const [{ employees }, { payrolls }] = await Promise.all([
+                    payrollService.employees(),
+                    payrollService.list()
+                ]);
+
+                return { employee, employees, payrolls };
+
+            } catch (error) {
+                if (error.status === 401) {
+                    return redirect("/auth/login");
+                }
+
+                throw error;
+            }
+        },
+        lazy: async () => ({
+            Component: (await import("../pages/PayrollPage.jsx")).default
+        }),
+        errorElement: <ErrorPage />,
+    },
+
       {
         path: "/caja",
         loader: async () => {
