@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 const recipeLine = z.object({
     inventoryItemId: z.number().int().positive(),
-    quantity: z.number().positive('La cantidad debe ser mayor que cero').max(100000),
+    quantity: z.number().int('La cantidad debe ser un número entero').positive('La cantidad debe ser mayor que cero').max(100000),
 }).strict();
 
 export const listProductsSchema = z.object({
@@ -40,4 +40,4 @@ export const updateProductSchema = z.object(productFields).strict().refine(
     message: 'Los productos preparados usan receta, no inventario vinculado', path: ['inventoryItemId'],
 });
 
-export const consumeProductSchema = z.object({ quantity: z.number().positive().max(10000) }).strict();
+export const consumeProductSchema = z.object({ quantity: z.number().int('La cantidad debe ser un número entero').positive().max(10000) }).strict();

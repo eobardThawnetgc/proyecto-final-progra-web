@@ -52,7 +52,7 @@ export default function EmployeeForm({ employee, branches, canAssignManager, sav
     }
 
     return (
-        <Modal isOpen toggle={onClose} centered scrollable>
+        <Modal isOpen toggle={onClose} centered scrollable className="employee-form-modal">
             <Form onSubmit={submit}>
                 <ModalHeader toggle={onClose}>{employee ? 'Editar empleado' : 'Registrar empleado'}</ModalHeader>
                 <ModalBody>

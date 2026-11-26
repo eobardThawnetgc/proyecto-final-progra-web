@@ -1,10 +1,11 @@
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { Link, useLoaderData, useNavigate, useRevalidator } from 'react-router-dom';
 import { Alert, Badge, Button, Card, CardBody, Container, Form, FormGroup, Input, Label, Spinner, Table } from 'reactstrap';
 import { toast } from 'sonner';
 import { logout } from '../services/authService.js';
 import { billingService } from '../services/billingService.js';
 import AppNavbar from '../components/AppNavbar.jsx';
+import { downloadInvoicePdf } from '../utils/invoicePdf.js';
 import './billing.css';
 
 const paymentMethods = [
@@ -23,6 +24,7 @@ const dateTime = (value) => new Intl.DateTimeFormat('es-SV', {
 const documentLabel = (sale) => `${sale.documentType === 'CCF' ? 'CCF' : 'Factura'} #${String(sale.documentNumber).padStart(6, '0')}`;
 const emptyBuyer = { customerName: '', customerNit: '', customerNrc: '' };
 const emptyLine = () => ({ productId: '', quantity: '1' });
+const paymentLabels = Object.fromEntries(paymentMethods);
 
 export default function BillingPage() {
     const { employee, products, sales, nextNumbers, hasOpenCashSession } = useLoaderData();
@@ -35,6 +37,19 @@ export default function BillingPage() {
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
     const [expandedSaleId, setExpandedSaleId] = useState(null);
+    const [printingSale, setPrintingSale] = useState(null);
+
+    useEffect(() => {
+        if (!printingSale) return undefined;
+        const timer = window.setTimeout(() => window.print(), 100);
+        return () => window.clearTimeout(timer);
+    }, [printingSale]);
+
+    useEffect(() => {
+        const clearPrint = () => setPrintingSale(null);
+        window.addEventListener('afterprint', clearPrint);
+        return () => window.removeEventListener('afterprint', clearPrint);
+    }, []);
 
     const productById = new Map(products.map((product) => [String(product.id), product]));
     const lineTotals = lines.map((line) => {
@@ -47,6 +62,11 @@ export default function BillingPage() {
     const subtotal = lineTotals.reduce((sum, amount) => sum + amount, 0);
     const tax = Math.round(subtotal * 0.13 * 100) / 100;
     const total = subtotal + tax;
+    const hasValidLines = lines.length > 0 && lines.every((line) => {
+        const quantity = Number(line.quantity);
+        return productById.has(line.productId) && Number.isSafeInteger(quantity) && quantity > 0;
+    });
+    const canSubmit = !saving && hasOpenCashSession && products.length > 0 && hasValidLines && total > 0;
 
     async function signOut() {
         try {
@@ -73,6 +93,11 @@ export default function BillingPage() {
             };
             const { sale } = await billingService.create(payload);
             toast.success(`${documentLabel(sale)} emitido correctamente`);
+            try {
+                downloadInvoicePdf(sale);
+            } catch {
+                toast.error('El documento se emitió, pero no se pudo descargar el PDF. Puedes intentarlo desde el historial.');
+            }
             setBuyer(emptyBuyer);
             setLines([emptyLine()]);
             setDocumentType('CONSUMER');
@@ -81,6 +106,7 @@ export default function BillingPage() {
             if (submitError.status === 401) navigate('/auth/login', { replace: true });
             else {
                 setError(submitError.message);
+                toast.error(submitError.message);
                 if (submitError.status === 409) await revalidate();
             }
         } finally {
@@ -181,9 +207,15 @@ export default function BillingPage() {
                                                         </td>
                                                         <td className="billing-quantity-cell">
                                                             <Label for={`quantity-${index}`} className="visually-hidden">Cantidad</Label>
-                                                            <Input id={`quantity-${index}`} type="number" min="0.001" step="0.001" required
+                                                            <Input id={`quantity-${index}`} type="text" inputMode="numeric"
+                                                                pattern="[0-9]*" maxLength={9} autoComplete="off" required
                                                                 value={line.quantity}
-                                                                onChange={(event) => setLines(lines.map((item, row) => row === index ? { ...item, quantity: event.target.value } : item))} />
+                                                                onChange={(event) => {
+                                                                    const value = event.target.value;
+                                                                    if (/^\d{0,9}$/.test(value)) {
+                                                                        setLines(lines.map((item, row) => row === index ? { ...item, quantity: value } : item));
+                                                                    }
+                                                                }} />
                                                         </td>
                                                         <td>{product ? money(product.price) : '—'}</td>
                                                         <td>{money(lineTotals[index])}</td>
@@ -208,10 +240,19 @@ export default function BillingPage() {
                                 </div>
                                 <div className="d-flex justify-content-end">
                                     <Button className="billing-primary" type="submit"
-                                        disabled={saving || !hasOpenCashSession || !products.length || total <= 0}>
+                                        disabled={!canSubmit}>
                                         {saving ? <><Spinner size="sm" className="me-2" />Emitiendo…</> : 'Emitir documento'}
                                     </Button>
                                 </div>
+                                {!hasOpenCashSession ? (
+                                    <p className="text-body-secondary small text-end mt-2 mb-0">
+                                        Abre un turno desde <Link to="/caja">Caja</Link> para habilitar la emisión.
+                                    </p>
+                                ) : !hasValidLines ? (
+                                    <p className="text-body-secondary small text-end mt-2 mb-0">
+                                        Selecciona un producto y escribe una cantidad entera mayor que cero.
+                                    </p>
+                                ) : null}
                             </Form>
                         )}
                     </CardBody>
@@ -240,10 +281,30 @@ export default function BillingPage() {
                                             <td>{money(sale.subtotal)}</td>
                                             <td>{money(sale.tax)}</td>
                                             <td><strong>{money(sale.total)}</strong></td>
-                                            <td><Button color="link" size="sm" aria-expanded={expanded}
-                                                onClick={() => setExpandedSaleId(expanded ? null : sale.id)}>
-                                                {expanded ? 'Ocultar' : 'Ver'}
-                                            </Button></td>
+                                            <td className="text-nowrap">
+                                                <Button color="link" size="sm" aria-expanded={expanded}
+                                                    onClick={() => setExpandedSaleId(expanded ? null : sale.id)}>
+                                                    {expanded ? 'Ocultar' : 'Ver'}
+                                                </Button>
+                                                <Button color="link" size="sm" className="text-success"
+                                                    title="Imprimir o guardar como PDF"
+                                                    aria-label={`Imprimir o guardar ${documentLabel(sale)} como PDF`}
+                                                    onClick={() => setPrintingSale(sale)}>
+                                                    <i className="bi bi-file-earmark-pdf me-1" aria-hidden="true" />PDF
+                                                </Button>
+                                                <Button color="link" size="sm" className="text-success"
+                                                    aria-label={`Descargar ${documentLabel(sale)}`}
+                                                    onClick={() => {
+                                                        try {
+                                                            downloadInvoicePdf(sale);
+                                                            toast.success(`${documentLabel(sale)} descargado`);
+                                                        } catch (downloadError) {
+                                                            toast.error(downloadError.message);
+                                                        }
+                                                    }}>
+                                                    <i className="bi bi-download me-1" aria-hidden="true" />Descargar
+                                                </Button>
+                                            </td>
                                         </tr>
                                         {expanded && <tr key={`${sale.id}-detail`} className="billing-detail-row">
                                             <td colSpan="8">
@@ -278,6 +339,43 @@ export default function BillingPage() {
                         </tbody>
                     </Table>
                 </Card>
+                {printingSale && (
+                    <section className="billing-print-document" aria-label="Documento para impresión o PDF">
+                        <header className="billing-print-header">
+                            <div>
+                                <p className="billing-print-brand">ORÍGENES SV</p>
+                                <p>Restaurante · El Salvador</p>
+                            </div>
+                            <div className="billing-print-number">
+                                <h1>{printingSale.documentType === 'CCF' ? 'Comprobante de crédito fiscal' : 'Factura consumidor final'}</h1>
+                                <strong>{documentLabel(printingSale)}</strong>
+                            </div>
+                        </header>
+                        <dl className="billing-print-customer">
+                            <div><dt>Fecha</dt><dd>{dateTime(printingSale.date)}</dd></div>
+                            <div><dt>Cliente</dt><dd>{printingSale.customerName || 'Consumidor final'}</dd></div>
+                            {printingSale.customerNit && <div><dt>NIT</dt><dd>{printingSale.customerNit}</dd></div>}
+                            {printingSale.customerNrc && <div><dt>NRC</dt><dd>{printingSale.customerNrc}</dd></div>}
+                            <div><dt>Atendió</dt><dd>{printingSale.employee.name}</dd></div>
+                        </dl>
+                        <table className="billing-print-lines">
+                            <thead><tr><th>Cantidad</th><th>Producto</th><th>Precio unitario</th><th>Importe</th></tr></thead>
+                            <tbody>{printingSale.details.map((detail) => (
+                                <tr key={detail.id}>
+                                    <td>{detail.quantity}</td><td>{detail.product.name}</td>
+                                    <td>{money(detail.unitPrice)}</td><td>{money(detail.subtotal)}</td>
+                                </tr>
+                            ))}</tbody>
+                        </table>
+                        <div className="billing-print-totals">
+                            <p><span>Subtotal</span><strong>{money(printingSale.subtotal)}</strong></p>
+                            <p><span>IVA (13%)</span><strong>{money(printingSale.tax)}</strong></p>
+                            <p className="billing-print-grand-total"><span>Total</span><strong>{money(printingSale.total)}</strong></p>
+                        </div>
+                        <p className="billing-print-payment">Pago: {printingSale.payments.map((payment) => `${paymentLabels[payment.method] ?? payment.method} ${money(payment.amount)}`).join(' · ')}</p>
+                        <footer>Gracias por su compra · Orígenes SV</footer>
+                    </section>
+                )}
             </Container>
         </main>
     );

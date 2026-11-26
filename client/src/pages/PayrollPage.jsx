@@ -9,6 +9,8 @@ import { toast } from "sonner";
 
 import { payrollService } from "../services/payrollService.js";
 import { logout } from "../services/authService.js";
+import AppNavbar from "../components/AppNavbar.jsx";
+import { downloadPayrollPdf } from "../utils/payrollPdf.js";
 
 // Formatea los valores monetarios en dólares.
 const money = (value) =>
@@ -60,7 +62,7 @@ export default function PayrollPage() {
     setError("");
 
     try {
-      await payrollService.create({
+      const { planilla } = await payrollService.create({
         employeeId: Number(form.employeeId),
         anio: Number(form.anio),
         mes: Number(form.mes),
@@ -69,6 +71,9 @@ export default function PayrollPage() {
 
       const result = await payrollService.list();
       setPayrolls(result.payrolls);
+
+      const employee = employees.find((item) => item.id === planilla.employeeId);
+      if (employee) downloadPayrollPdf({ ...planilla, employee });
 
       toast.success("Planilla generada correctamente");
     } catch (err) {
@@ -94,26 +99,7 @@ export default function PayrollPage() {
 
   return (
     <main className="min-vh-100" style={{ background: "#f3efe6" }}>
-      <header className="py-3" style={{ background: "#344c3b" }}>
-        <Container className="d-flex justify-content-between align-items-center">
-          <div className="text-white">
-            <h5 className="fw-bold mb-0">Orígenes SV</h5>
-            <small>Nómina</small>
-          </div>
-
-          <div className="d-flex align-items-center gap-3 text-white">
-            <span>{currentUser.name}</span>
-            <Button
-              outline
-              color="light"
-              size="sm"
-              onClick={handleLogout}
-            >
-              Cerrar sesión
-            </Button>
-          </div>
-        </Container>
-      </header>
+      <AppNavbar employee={currentUser} onSignOut={handleLogout} />
 
       <Container className="py-4">
         <h1 className="mb-2">Gestión de Nómina</h1>
@@ -243,6 +229,7 @@ export default function PayrollPage() {
                     <th>AFP</th>
                     <th>ISR</th>
                     <th>Neto</th>
+                    <th>Comprobante</th>
                   </tr>
                 </thead>
 
@@ -262,12 +249,15 @@ export default function PayrollPage() {
                       <td className="fw-bold">
                         {money(payroll.netSalary)}
                       </td>
+                      <td><Button color="link" size="sm" onClick={() => downloadPayrollPdf(payroll)}>
+                        <i className="bi bi-download me-1" aria-hidden="true" />Descargar PDF
+                      </Button></td>
                     </tr>
                   ))}
 
                   {payrolls.length === 0 && (
                     <tr>
-                      <td colSpan="7" className="text-center py-4">
+                      <td colSpan="8" className="text-center py-4">
                         No hay planillas registradas.
                       </td>
                     </tr>

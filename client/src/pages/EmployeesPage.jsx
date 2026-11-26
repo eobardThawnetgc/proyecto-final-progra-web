@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useLoaderData, useNavigate } from 'react-router-dom';
-import { Alert, Badge, Button, Card, CardBody, Container, Input, Navbar, NavbarBrand, Table } from 'reactstrap';
+import { Alert, Badge, Button, Card, CardBody, Container, Input, Table } from 'reactstrap';
 import { toast } from 'sonner';
 import EmployeeForm from '../components/employees/EmployeeForm.jsx';
 import { employeesService } from '../services/employeesService.js';
 import { logout } from '../services/authService.js';
+import AppNavbar from '../components/AppNavbar.jsx';
 import './employees.css';
 
 const roleLabels = { ADMIN: 'Administrador', MANAGER: 'Gerente', CASHIER: 'Cajero', EMPLOYEE: 'Empleado' };
@@ -32,8 +33,6 @@ export default function EmployeesPage() {
             else setPageError(error.message);
         }
     }, [navigate]);
-
-    useEffect(() => { setEmployees(initialEmployees); }, [initialEmployees]);
 
     const visible = useMemo(() => employees.filter((item) => {
         const matchesStatus = filter === 'all' || (filter === 'active' ? item.active : !item.active);
@@ -87,16 +86,7 @@ export default function EmployeesPage() {
 
     return (
         <main className="employees-page">
-            <Navbar className="employees-header px-3 px-md-4" expand="md">
-                <NavbarBrand tag="div" className="text-white">
-                    <span className="h5 fw-bold d-block mb-0">Orígenes SV</span>
-                    <small className="opacity-75">Recursos humanos</small>
-                </NavbarBrand>
-                <div className="d-flex align-items-center gap-3 text-white">
-                    <span className="small">{currentUser.name}</span>
-                    <Button outline color="light" size="sm" onClick={signOut}>Cerrar sesión</Button>
-                </div>
-            </Navbar>
+            <AppNavbar employee={currentUser} onSignOut={signOut} />
             <Container className="py-4 py-md-5">
                 <div className="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
                     <div>

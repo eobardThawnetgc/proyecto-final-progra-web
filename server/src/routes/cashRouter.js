@@ -7,7 +7,7 @@ import {
 
 const cashRouter = express.Router();
 
-cashRouter.use(authenticate, authorize('ADMIN', 'MANAGER', 'CASHIER'));
+cashRouter.use(authenticate, authorize('ADMIN', 'MANAGER', 'CASHIER', 'EMPLOYEE'));
 cashRouter.get('/current', getCurrentSession);
 cashRouter.get('/sessions', getSessions);
 cashRouter.post('/sessions', openSession);

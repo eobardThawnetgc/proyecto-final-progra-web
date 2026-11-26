@@ -6,12 +6,16 @@ import { typeLabel } from '../../constants/inventory.js'
 export default function InventoryTable({ items, canManage, onEdit, onAdjust, onDelete }) {
   //si esta vacio mostrar el mensaje
   if (items.length === 0) {
-    return <p className="p-4 text-center text-muted mb-0">No hay insumos que coincidan con la búsqueda.</p>
+    return <div className="inventory-empty-state">
+      <i className="bi bi-box-seam" aria-hidden="true" />
+      <p className="mb-1">No hay insumos que coincidan con la búsqueda.</p>
+      <small>Prueba con otro término o cambia los filtros.</small>
+    </div>
   }
 
   return (
-    <Table responsive hover className="align-middle mb-0">
-      <thead className="table-light">
+    <Table responsive hover className="inventory-table align-middle mb-0">
+      <thead>
         <tr>
           <th>Insumo</th>
           <th>Tipo</th>
@@ -24,7 +28,7 @@ export default function InventoryTable({ items, canManage, onEdit, onAdjust, onD
       <tbody>
         {items.map((item) => (
           //filas de datos y alerta visual
-          <tr key={item.id} className={item.status === 'OK' ? '' : 'table-warning'}>
+          <tr key={item.id} className={item.status === 'OK' ? '' : 'inventory-row-alert'}>
             <td className="fw-semibold">{item.name}</td>
             <td>{typeLabel(item.type)}</td>
             <td className="text-end">{item.quantity} {item.unit}</td>
@@ -33,9 +37,15 @@ export default function InventoryTable({ items, canManage, onEdit, onAdjust, onD
             {canManage && (
               //botones de accion
               <td className="text-end text-nowrap">
-                <Button size="sm" color="warning" outline className="me-1" onClick={() => onAdjust(item)}>Ajustar</Button>
-                <Button size="sm" color="primary" outline className="me-1" onClick={() => onEdit(item)}>Editar</Button>
-                <Button size="sm" color="danger" outline onClick={() => onDelete(item)}>Eliminar</Button>
+                <Button type="button" size="sm" className="inventory-action-adjust me-1" onClick={() => onAdjust(item)}>
+                  <i className="bi bi-arrow-left-right me-1" aria-hidden="true" />Ajustar
+                </Button>
+                <Button type="button" size="sm" className="inventory-action-edit me-1" onClick={() => onEdit(item)}>
+                  <i className="bi bi-pencil me-1" aria-hidden="true" />Editar
+                </Button>
+                <Button type="button" size="sm" className="inventory-action-delete" onClick={() => onDelete(item)}>
+                  <i className="bi bi-trash3 me-1" aria-hidden="true" />Eliminar
+                </Button>
               </td>
             )}
           </tr>

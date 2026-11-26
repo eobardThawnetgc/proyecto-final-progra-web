@@ -5,11 +5,20 @@ import './app-navbar.css';
 export default function AppNavbar({ employee, onSignOut }) {
     const { pathname } = useLocation();
     const canManage = ['ADMIN', 'MANAGER'].includes(employee?.role);
+    const canOperateSales = ['ADMIN', 'MANAGER', 'CASHIER', 'EMPLOYEE'].includes(employee?.role);
     const links = [
         { to: '/productos', label: 'Productos' },
-        { to: '/facturacion', label: 'Facturación' },
-        { to: '/caja', label: 'Caja' },
-        ...(canManage ? [{ to: '/compras', label: 'Compras' }] : []),
+        { to: '/inventario', label: 'Inventario' },
+        ...(canOperateSales ? [
+            { to: '/ventas', label: 'Ventas (POS)' },
+            { to: '/facturacion', label: 'Facturación' },
+            { to: '/caja', label: 'Caja' },
+        ] : []),
+        ...(canManage ? [
+            { to: '/compras', label: 'Compras' },
+            { to: '/recursos-humanos', label: 'Recursos humanos' },
+            { to: '/nomina', label: 'Nómina' },
+        ] : []),
     ];
 
     return (

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 const quantity = z.string().trim()
-    .regex(/^\d{1,9}(\.\d{1,3})?$/, 'Ingresa una cantidad con hasta tres decimales')
+    .regex(/^\d{1,9}$/, 'Ingresa una cantidad entera de hasta 9 dígitos')
     .refine((value) => Number(value) > 0, 'La cantidad debe ser mayor que cero');
 
 const customerField = (max) => z.string().trim().max(max).nullable().default(null);

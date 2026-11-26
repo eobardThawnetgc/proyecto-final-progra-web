@@ -36,3 +36,16 @@ test('CCF accepts complete customer details', () => {
 
     assert.equal(result.success, true);
 });
+
+test('invoice quantity accepts whole positive numbers', () => {
+    const result = invoiceSchema.safeParse({ ...invoice, details: [{ productId: 1, quantity: '25' }] });
+
+    assert.equal(result.success, true);
+});
+
+test('invoice quantity rejects decimals, zero, and negative numbers', () => {
+    for (const quantity of ['1.5', '0', '-2']) {
+        const result = invoiceSchema.safeParse({ ...invoice, details: [{ productId: 1, quantity }] });
+        assert.equal(result.success, false, `Expected quantity ${quantity} to be rejected`);
+    }
+});

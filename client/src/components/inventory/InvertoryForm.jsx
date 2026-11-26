@@ -6,6 +6,7 @@ import { INVENTORY_TYPES, UNITS } from '../../constants/inventory.js'
 // item === null → crear | item = {...} → editar
 export default function InventoryForm({ item, saving, error, onSubmit, onClose }) {
   const isEdit = item !== null
+  const setInteger = (name, value) => { if (/^\d*$/.test(value)) setForm((current) => ({ ...current, [name]: value })) }
 
   //estado del formulario y actualizacion de campos
   const [form, setForm] = useState({
@@ -72,16 +73,16 @@ export default function InventoryForm({ item, saving, error, onSubmit, onClose }
             <Col xs="6">
               <FormGroup>
                 <Label for="quantity">Existencia inicial</Label>
-                <Input id="quantity" name="quantity" type="number" min="0" step="0.001"
-                  value={form.quantity} onChange={handleChange} />
+                <Input id="quantity" name="quantity" type="text" inputMode="numeric" pattern="[0-9]*" maxLength="9"
+                  value={form.quantity} onChange={(event) => setInteger("quantity", event.target.value)} />
               </FormGroup>
             </Col>
           )}
           <Col xs={isEdit ? '12' : '6'}>
             <FormGroup>
               <Label for="minimumStock">Stock mínimo</Label>
-              <Input id="minimumStock" name="minimumStock" type="number" min="0" step="0.001"
-                value={form.minimumStock} onChange={handleChange} />
+              <Input id="minimumStock" name="minimumStock" type="text" inputMode="numeric" pattern="[0-9]*" maxLength="9"
+                value={form.minimumStock} onChange={(event) => setInteger("minimumStock", event.target.value)} />
             </FormGroup>
           </Col>
         </Row>
@@ -91,8 +92,10 @@ export default function InventoryForm({ item, saving, error, onSubmit, onClose }
         )}
 
         <div className="d-flex justify-content-end gap-2 mt-3">
-          <Button type="button" color="secondary" outline onClick={onClose}>Cancelar</Button>
-          <Button color="warning" disabled={saving}>{saving ? 'Guardando...' : 'Guardar'}</Button>
+          <Button type="button" className="inventory-secondary-button" onClick={onClose}>Cancelar</Button>
+          <Button type="submit" className="inventory-primary-button" disabled={saving}>
+            {saving ? <><span className="spinner-border spinner-border-sm me-2" aria-hidden="true" />Guardando...</> : 'Guardar'}
+          </Button>
         </div>
       </Form>
     </AppModal>

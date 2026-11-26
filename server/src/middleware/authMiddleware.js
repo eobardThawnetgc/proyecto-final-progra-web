@@ -64,6 +64,7 @@ export const authenticate = async (req, res, next) => {
 
         // Guardar los datos del empleado para los siguientes middlewares
         req.employee = employee;
+        req.sessionExpiresAt = decoded.exp ? decoded.exp * 1000 : null;
 
         next();
 

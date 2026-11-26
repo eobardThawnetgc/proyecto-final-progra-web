@@ -58,6 +58,19 @@ export default function PurchasesPage() {
     }
 
     const close = () => setDialog(null);
+    function startPurchase() {
+        if (!suppliers.length) {
+            toast.warning('Primero registra un proveedor para poder asociar la factura de compra.');
+            setSection('Proveedores');
+            open('supplier');
+            return;
+        }
+        if (!branches.length) {
+            toast.error('Registra una sucursal antes de crear compras.');
+            return;
+        }
+        open('purchase');
+    }
 
     return (
         <main className="purchases-page">
@@ -72,6 +85,10 @@ export default function PurchasesPage() {
                                     onClick={() => setSection(name)}>{name}</button>
                             ))}
                         </nav>
+                        {isPurchases && suppliers.length === 0 && <Alert color="warning" className="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                            <span><strong>Primero necesitas un proveedor.</strong> Las facturas de compra deben quedar asociadas a uno.</span>
+                            <Button size="sm" className="purchase-primary" onClick={() => open('supplier')}>Registrar proveedor</Button>
+                        </Alert>}
                         <Card className="purchase-card overflow-hidden" aria-busy={state === 'loading'}>
                             <div className="purchase-toolbar d-flex flex-wrap justify-content-between align-items-center gap-3 p-3 p-md-4">
                                 <h2 className="h5 mb-0">{isPurchases ? 'Facturas de compra' : 'Directorio de proveedores'}</h2>
@@ -84,8 +101,8 @@ export default function PurchasesPage() {
                                             {Object.entries(paymentStatuses).map(([value, { label }]) => <option key={value} value={value}>{label}</option>)}
                                         </Input>
                                     </>}
-                                    <Button className="purchase-primary" disabled={saving || (isPurchases && (!suppliers.length || !branches.length))}
-                                        onClick={() => open(isPurchases ? 'purchase' : 'supplier')}>
+                                    <Button className="purchase-primary" disabled={saving || (isPurchases && !branches.length)}
+                                        onClick={() => isPurchases ? startPurchase() : open('supplier')}>
                                         <i className="bi bi-plus-lg me-2" aria-hidden="true" />
                                         {isPurchases ? 'Registrar compra' : 'Nuevo proveedor'}
                                     </Button>

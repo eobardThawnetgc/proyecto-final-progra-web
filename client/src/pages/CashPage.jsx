@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useState } from 'react';
+import { Fragment, useCallback, useRef, useState } from 'react';
 import { useLoaderData, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
@@ -19,6 +19,13 @@ const paymentMethods = [
 ];
 
 const emptyCounts = { cash: '', card: '', digital: '', bitcoin: '', chivoWallet: '' };
+const initialCountsFor = (session) => {
+    if (!session) return emptyCounts;
+    return Object.fromEntries(paymentMethods.map(({ key, method }) => {
+        const expected = session.reconciliation[method].expected;
+        return [key, Number(expected) === 0 ? '0.00' : ''];
+    }));
+};
 const money = (amount) => new Intl.NumberFormat('es-SV', {
     style: 'currency', currency: 'USD', minimumFractionDigits: 2,
 }).format(Number(amount ?? 0));
@@ -32,8 +39,9 @@ export default function CashPage() {
     const navigate = useNavigate();
     const [session, setSession] = useState(initialSession);
     const [sessions, setSessions] = useState(initialSessions);
+    const countsSessionId = useRef(initialSession?.id ?? null);
     const [openingAmount, setOpeningAmount] = useState('0.00');
-    const [counts, setCounts] = useState(emptyCounts);
+    const [counts, setCounts] = useState(() => initialCountsFor(initialSession));
     const [expandedSessionId, setExpandedSessionId] = useState(null);
     const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
@@ -46,6 +54,11 @@ export default function CashPage() {
             const [current, history] = await Promise.all([
                 cashService.current(), cashService.sessions(),
             ]);
+            const currentSessionId = current.session?.id ?? null;
+            if (currentSessionId !== countsSessionId.current) {
+                countsSessionId.current = currentSessionId;
+                setCounts(initialCountsFor(current.session));
+            }
             setSession(current.session);
             setSessions(history.sessions);
         } catch (error) {
@@ -141,7 +154,7 @@ export default function CashPage() {
                             <Form onSubmit={handleClose}>
                                 <h3 className="h5 mb-1">Cuadre de caja</h3>
                                 <p className="text-body-secondary mb-3">
-                                    Compara los pagos registrados con los montos contados o confirmados. El efectivo esperado incluye el fondo inicial.
+                                    Compara los pagos registrados con los montos contados o confirmados. El efectivo esperado incluye el fondo inicial; los métodos sin movimientos comienzan en $0.00.
                                 </p>
                                 <div className="table-responsive">
                                     <Table className="cash-table align-middle mb-3">

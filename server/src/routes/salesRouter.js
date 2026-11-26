@@ -5,7 +5,7 @@ import { authenticate } from '../middleware/authMiddleware.js';
 import { authorize } from '../middleware/roleMiddleware.js';
 
 const salesRouter = express.Router();
-salesRouter.use(authenticate, authorize('ADMIN', 'MANAGER', 'CASHIER'));
+salesRouter.use(authenticate, authorize('ADMIN', 'MANAGER', 'CASHIER', 'EMPLOYEE'));
 salesRouter.get('/products', getPosProducts);
 salesRouter.get('/', getSales);
 

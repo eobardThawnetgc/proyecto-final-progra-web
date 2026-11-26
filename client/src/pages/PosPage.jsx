@@ -1,261 +1,217 @@
-import { useEffect, useMemo, useState } from "react";
-import { fetchPosProducts, createPosSale } from "../services/salesService";
+import { useMemo, useState } from 'react';
+import { Link, useLoaderData, useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { Alert, Badge, Button, Card, CardBody, Col, Container, Input, Label, Row, Spinner } from 'reactstrap';
+import AppNavbar from '../components/AppNavbar.jsx';
+import { logout } from '../services/authService.js';
+import { createPosSale } from '../services/salesService.js';
+import { downloadInvoicePdf } from '../utils/invoicePdf.js';
+import './pos.css';
+
+const paymentMethods = [
+    ['CASH', 'Efectivo'],
+    ['CARD', 'Tarjeta'],
+    ['DIGITAL', 'Pago digital'],
+    ['BITCOIN', 'Bitcoin'],
+    ['CHIVO_WALLET', 'Chivo Wallet'],
+];
+const money = (amount) => new Intl.NumberFormat('es-SV', {
+    style: 'currency', currency: 'USD', minimumFractionDigits: 2,
+}).format(Number(amount ?? 0));
 
 export default function PosPage() {
-  const [products, setProducts] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [cart, setCart] = useState([]);
-  const [paymentMethod, setPaymentMethod] = useState("CASH");
-  const [loadingProducts, setLoadingProducts] = useState(true);
-  const [submittingSale, setSubmittingSale] = useState(false);
-  const [feedback, setFeedback] = useState({ type: "", message: "" });
+    const { employee, products, hasOpenCashSession } = useLoaderData();
+    const navigate = useNavigate();
+    const [searchTerm, setSearchTerm] = useState('');
+    const [cart, setCart] = useState([]);
+    const [paymentMethod, setPaymentMethod] = useState('CASH');
+    const [submittingSale, setSubmittingSale] = useState(false);
+    const [feedback, setFeedback] = useState(null);
 
-  useEffect(() => {
-    const loadProducts = async () => {
-      setLoadingProducts(true);
-      try {
-        const list = await fetchPosProducts();
-        setProducts(Array.isArray(list) ? list : []);
-      } catch (err) {
-        setFeedback({
-          type: "error",
-          message:
-          err?.message ||
-            "No se pudieron cargar los productos del menú.",
+    const filteredProducts = useMemo(() => {
+        const query = searchTerm.trim().toLocaleLowerCase('es');
+        return products.filter((product) => product.name.toLocaleLowerCase('es').includes(query));
+    }, [products, searchTerm]);
+    const subtotal = cart.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0);
+    const tax = Math.round(subtotal * 0.13 * 100) / 100;
+    const total = subtotal + tax;
+
+    async function signOut() {
+        try {
+            await logout();
+            navigate('/auth/login', { replace: true });
+        } catch (error) {
+            toast.error(error.message);
+        }
+    }
+
+    function addToCart(product) {
+        setFeedback(null);
+        setCart((current) => {
+            const existing = current.find((item) => item.id === product.id);
+            return existing
+                ? current.map((item) => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item)
+                : [...current, { ...product, quantity: 1 }];
         });
-      } finally {
-        setLoadingProducts(false);
-      }
-    };
+    }
 
-    loadProducts();
-  }, []);
-
-  const filteredProducts = useMemo(() => {
-    const query = searchTerm.trim().toLowerCase();
-    if (!query) return products;
-    return products.filter((prod) =>
-      String(prod.name || "").toLowerCase().includes(query)
-    );
-  }, [products, searchTerm]);
-
-  const addToCart = (product) => {
-    setFeedback({ type: "", message: "" });
-    setCart((prevCart) => {
-      const existingIndex = prevCart.findIndex(
-        (item) => item.productId === product.id
-      );
-      if (existingIndex > -1) {
-        return prevCart.map((item, idx) =>
-          idx === existingIndex ? { ...item, quantity: item.quantity + 1 } : item
-        );
-      }
-      return [
-        ...prevCart,
-        {
-          productId: product.id,
-          name: product.name,
-          unitPrice: Number(product.price),
-          quantity: 1,
-        },
-      ];
-    });
-  };
-
-  const updateQuantity = (productId, delta) => {
-    setCart((prevCart) =>
-      prevCart
-        .map((item) =>
-          item.productId === productId
+    function updateQuantity(productId, delta) {
+        setCart((current) => current.map((item) => item.id === productId
             ? { ...item, quantity: item.quantity + delta }
-            : item
-        )
-        .filter((item) => item.quantity > 0)
-    );
-  };
-
-  const removeFromCart = (productId) => {
-    setCart((prevCart) =>
-      prevCart.filter((item) => item.productId !== productId)
-    );
-  };
-
-  const cartTotal = useMemo(() => {
-    return cart.reduce((acc, item) => acc + item.unitPrice * item.quantity, 0);
-  }, [cart]);
-
-  const handleCheckout = async () => {
-    if (cart.length === 0) {
-      setFeedback({
-        type: "error",
-        message: "Agrega al menos un producto al carrito.",
-      });
-      return;
+            : item).filter((item) => item.quantity > 0));
     }
 
-    setSubmittingSale(true);
-    setFeedback({ type: "", message: "" });
+    async function handleCheckout() {
+        if (!hasOpenCashSession) {
+            setFeedback({ type: 'warning', message: 'Abre un turno de caja antes de registrar la venta.' });
+            return;
+        }
+        if (!cart.length) {
+            setFeedback({ type: 'warning', message: 'Agrega al menos un producto al carrito.' });
+            return;
+        }
 
-    try {
-      const payload = {
-        paymentMethod,
-        amountPaid: Number(cartTotal.toFixed(2)),
-        items: cart.map(({ productId, quantity }) => ({
-          productId,
-          quantity,
-        })),
-      };
+        setSubmittingSale(true);
+        setFeedback(null);
+        try {
+            const result = await createPosSale({
+                documentType: 'CONSUMER',
+                paymentMethod,
+                items: cart.map(({ id, quantity }) => ({ productId: id, quantity })),
+            });
+            if (!result.sale) throw new Error('La venta se procesó sin devolver el documento emitido.');
 
-      const result = await createPosSale(payload);
-      setCart([]);
-      setFeedback({
-        type: "success",
-        message: result?.message || "Venta registrada correctamente.",
-      });
-    } catch (err) {
-      setFeedback({
-        type: "error",
-        message: err?.message || "Error al registrar la venta.",
-      });
-    } finally {
-      setSubmittingSale(false);
+            setCart([]);
+            setFeedback({
+                type: 'success',
+                message: `Factura #${String(result.sale.documentNumber).padStart(6, '0')} registrada. El PDF se descargó.`,
+            });
+            try {
+                downloadInvoicePdf(result.sale);
+                toast.success('Venta registrada y factura descargada');
+            } catch (downloadError) {
+                toast.error(`La venta se registró, pero no se pudo descargar el PDF: ${downloadError.message}`);
+            }
+        } catch (error) {
+            if (error.status === 401) navigate('/auth/login', { replace: true });
+            else {
+                setFeedback({ type: 'danger', message: error.message || 'No se pudo registrar la venta.' });
+                toast.error(error.message || 'No se pudo registrar la venta.');
+            }
+        } finally {
+            setSubmittingSale(false);
+        }
     }
-  };
 
-  return (
-    <div className="p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <section className="lg:col-span-2 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <h1 className="text-2xl font-bold">Punto de Venta (POS)</h1>
-          <input
-            type="text"
-            placeholder="Buscar producto..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="border rounded px-3 py-2 w-full sm:w-64"
-          />
-        </div>
-
-        {feedback.message && (
-          <div
-            className={`p-3 rounded text-sm ${
-              feedback.type === "success"
-                ? "bg-green-100 text-green-800"
-                : "bg-red-100 text-red-800"
-            }`}
-          >
-            {feedback.message}
-          </div>
-        )}
-
-        {loadingProducts ? (
-          <p>Cargando productos...</p>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {filteredProducts.map((product) => (
-              <div
-                key={product.id}
-                className="border rounded-lg p-4 flex flex-col justify-between"
-              >
-                <div>
-                  <h2 className="font-semibold text-base">{product.name}</h2>
-                  <p className="text-sm text-gray-600 mt-1">
-                    ${Number(product.price).toFixed(2)}
-                  </p>
+    return (
+        <main className="pos-page">
+            <AppNavbar employee={employee} onSignOut={signOut} />
+            <Container className="py-4 py-md-5">
+                <div className="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+                    <div>
+                        <p className="pos-eyebrow mb-1">VENTAS</p>
+                        <h1 className="pos-title mb-1">Punto de venta</h1>
+                        <p className="text-body-secondary mb-0">Selecciona productos, arma el carrito y registra la venta.</p>
+                    </div>
+                    <Badge color={hasOpenCashSession ? 'success' : 'warning'} pill>
+                        {hasOpenCashSession ? 'Caja abierta' : 'Caja cerrada'}
+                    </Badge>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => addToCart(product)}
-                  className="mt-4 bg-black text-white py-2 px-3 rounded text-sm hover:opacity-90"
-                >
-                  Agregar al carrito
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
 
-      <aside className="border rounded-lg p-4 flex flex-col justify-between h-fit space-y-4">
-        <div>
-          <h2 className="text-xl font-semibold mb-3">Carrito de compra</h2>
+                {!hasOpenCashSession && (
+                    <Alert color="warning">
+                        Para cobrar una venta abre primero un turno en <Link to="/caja">Caja</Link>.
+                    </Alert>
+                )}
+                {feedback && <Alert color={feedback.type}>{feedback.message}</Alert>}
 
-          {cart.length === 0 ? (
-            <p className="text-sm text-gray-500">No hay productos agregados.</p>
-          ) : (
-            <ul className="divide-y">
-              {cart.map((item) => (
-                <li
-                  key={item.productId}
-                  className="py-3 flex items-center justify-between gap-2"
-                >
-                  <div>
-                    <p className="font-medium text-sm">{item.name}</p>
-                    <p className="text-xs text-gray-500">
-                      ${(item.unitPrice * item.quantity).toFixed(2)}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => updateQuantity(item.productId, -1)}
-                      className="px-2 py-1 border rounded text-xs"
-                    >
-                      -
-                    </button>
-                    <span className="text-sm">{item.quantity}</span>
-                    <button
-                      type="button"
-                      onClick={() => updateQuantity(item.productId, 1)}
-                      className="px-2 py-1 border rounded text-xs"
-                    >
-                      +
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => removeFromCart(item.productId)}
-                      className="text-xs text-red-600 ml-1"
-                    >
-                      Quitar
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+                <Row className="g-4 align-items-start">
+                    <Col lg="8">
+                        <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+                            <h2 className="h5 mb-0">Menú</h2>
+                            <Input className="pos-search" type="search" placeholder="Buscar producto…"
+                                value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} />
+                        </div>
+                        {!filteredProducts.length ? (
+                            <Card className="pos-card"><CardBody className="text-center text-body-secondary py-5">
+                                {products.length ? 'No hay productos que coincidan con la búsqueda.' : 'No hay productos activos en esta sucursal.'}
+                            </CardBody></Card>
+                        ) : (
+                            <Row className="g-3">
+                                {filteredProducts.map((product) => (
+                                    <Col sm="6" xl="4" key={product.id}>
+                                        <Card className="pos-product-card h-100">
+                                            <CardBody className="d-flex flex-column">
+                                                <div className="d-flex justify-content-between gap-2">
+                                                    <h3 className="h6 mb-2">{product.name}</h3>
+                                                    <Badge color="light" className="pos-product-type">
+                                                        {product.type === 'PACKAGED' ? 'Empacado' : 'Preparado'}
+                                                    </Badge>
+                                                </div>
+                                                {product.description && <p className="small text-body-secondary">{product.description}</p>}
+                                                <strong className="pos-product-price mt-auto">{money(product.price)}</strong>
+                                                <Button color="success" className="mt-3" onClick={() => addToCart(product)}>
+                                                    <i className="bi bi-plus-lg me-2" aria-hidden="true" />Agregar al carrito
+                                                </Button>
+                                            </CardBody>
+                                        </Card>
+                                    </Col>
+                                ))}
+                            </Row>
+                        )}
+                    </Col>
 
-        <div className="border-t pt-4 space-y-3">
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Método de pago
-            </label>
-            <select
-              value={paymentMethod}
-              onChange={(e) => setPaymentMethod(e.target.value)}
-              className="w-full border rounded px-3 py-2 text-sm"
-            >
-              <option value="CASH">Efectivo</option>
-              <option value="CARD">Tarjeta</option>
-              <option value="CHIVO_WALLET">Chivo Wallet / Bitcoin</option>
-            </select>
-          </div>
+                    <Col lg="4">
+                        <Card className="pos-card pos-cart-card">
+                            <CardBody>
+                                <div className="d-flex justify-content-between align-items-center mb-3">
+                                    <h2 className="h5 mb-0">Carrito</h2>
+                                    <Badge color="success" pill>{cart.reduce((sum, item) => sum + item.quantity, 0)} artículos</Badge>
+                                </div>
+                                {!cart.length ? (
+                                    <p className="text-body-secondary py-3 mb-0">Agrega productos del menú para comenzar.</p>
+                                ) : (
+                                    <ul className="pos-cart-list list-unstyled mb-3">
+                                        {cart.map((item) => (
+                                            <li key={item.id} className="pos-cart-item">
+                                                <div className="flex-grow-1">
+                                                    <strong>{item.name}</strong>
+                                                    <small>{money(Number(item.price) * item.quantity)}</small>
+                                                </div>
+                                                <div className="d-flex align-items-center gap-1">
+                                                    <Button size="sm" color="light" aria-label={`Quitar una unidad de ${item.name}`}
+                                                        onClick={() => updateQuantity(item.id, -1)}>−</Button>
+                                                    <span className="pos-cart-quantity">{item.quantity}</span>
+                                                    <Button size="sm" color="light" aria-label={`Agregar una unidad de ${item.name}`}
+                                                        onClick={() => updateQuantity(item.id, 1)}>+</Button>
+                                                </div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
 
-          <div className="flex items-center justify-between text-lg font-bold">
-            <span>Total</span>
-            <span>${cartTotal.toFixed(2)}</span>
-          </div>
-
-          <button
-            type="button"
-            disabled={submittingSale || cart.length === 0}
-            onClick={handleCheckout}
-            className="w-full bg-emerald-600 text-white py-2.5 rounded font-medium disabled:opacity-50"
-          >
-            {submittingSale ? "Registrando venta..." : "Registrar venta"}
-          </button>
-        </div>
-      </aside>
-    </div>
-  );
+                                <div className="pos-payment-field mb-3">
+                                    <Label for="pos-payment-method">Método de pago</Label>
+                                    <Input id="pos-payment-method" type="select" value={paymentMethod}
+                                        onChange={(event) => setPaymentMethod(event.target.value)}>
+                                        {paymentMethods.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                                    </Input>
+                                </div>
+                                <div className="pos-totals">
+                                    <div><span>Subtotal</span><strong>{money(subtotal)}</strong></div>
+                                    <div><span>IVA (13%)</span><strong>{money(tax)}</strong></div>
+                                    <div className="pos-total"><span>Total</span><strong>{money(total)}</strong></div>
+                                </div>
+                                <Button color="success" className="w-100 mt-3" disabled={submittingSale || !cart.length || !hasOpenCashSession}
+                                    onClick={handleCheckout}>
+                                    {submittingSale ? <><Spinner size="sm" className="me-2" />Registrando…</> : 'Registrar venta y descargar factura'}
+                                </Button>
+                                <Link className="d-block text-center small mt-3" to="/facturacion">Ver historial de facturas</Link>
+                            </CardBody>
+                        </Card>
+                    </Col>
+                </Row>
+            </Container>
+        </main>
+    );
 }

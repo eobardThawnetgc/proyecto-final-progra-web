@@ -162,3 +162,4 @@ export default function PurchaseForm({ branches, homeBranchId, suppliers, close,
         </Modal>
     );
 }
+

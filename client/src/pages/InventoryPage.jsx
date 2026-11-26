@@ -1,20 +1,22 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLoaderData, useNavigate } from 'react-router-dom'
 import {
   Alert, Button, Card, CardBody, Col, Container, FormGroup, Input,
-  Label, Navbar, NavbarBrand, Row, Spinner,
+  Label, Row, Spinner,
 } from 'reactstrap'
-import { useAuth } from '../context/auth-context.js'
+import { logout } from '../services/authService.js'
 import { inventoryService } from '../services/inventoryService.js'
 import { INVENTORY_TYPES } from '../constants/inventory.js'
 import InventoryTable from '../components/inventory/InventoryTable.jsx'
-import InventoryForm from '../components/inventory/InventoryForm.jsx'
+import InventoryForm from '../components/inventory/InvertoryForm.jsx'
 import StockAdjustModal from '../components/inventory/StockAdjustModal.jsx'
+import AppNavbar from '../components/AppNavbar.jsx'
+import './inventory.css'
 
 const EMPTY_FILTERS = { search: '', type: '', lowStock: false }
 
 export default function InventoryPage() {
-  const { employee, logout } = useAuth()
+  const { employee } = useLoaderData()
   const navigate = useNavigate()
 
   const [items, setItems] = useState([])
@@ -34,7 +36,7 @@ export default function InventoryPage() {
 
   const handleApiError = useCallback((error) => {
     if (error.status === 401) {
-      navigate('/login')
+      navigate('/auth/login', { replace: true })
       return
     }
     setPageError(error.message)
@@ -99,7 +101,7 @@ export default function InventoryPage() {
       setNotice(successMessage)
       await loadData()
     } catch (error) {
-      if (error.status === 401) navigate('/login')
+      if (error.status === 401) navigate('/auth/login', { replace: true })
       else setModalError(error)
     } finally {
       setSaving(false)
@@ -127,35 +129,46 @@ export default function InventoryPage() {
   }
 
   const handleLogout = async () => {
-    await logout()
-    navigate('/login')
+    try {
+      await logout()
+      navigate('/auth/login', { replace: true })
+    } catch (error) {
+      setPageError(error.message)
+    }
   }
 
   const summaryCards = [
-    ['Insumos', summary.total, 'text-dark'],
-    ['Stock bajo', summary.low, 'text-warning'],
-    ['Agotados', summary.out, 'text-danger'],
+    ['Insumos', summary.total, 'bi-box-seam', 'inventory-summary-total'],
+    ['Stock bajo', summary.low, 'bi-exclamation-triangle', 'inventory-summary-low'],
+    ['Agotados', summary.out, 'bi-archive', 'inventory-summary-out'],
   ]
 
   return (
-    <main className="min-vh-100 bg-light">
-      <Navbar color="white" light className="shadow-sm px-3">
-        <NavbarBrand tag="div">
-          <span className="h5 fw-bold d-block mb-0">Inventario de insumos</span>
-          <small className="text-muted">{employee.name} · {employee.role}</small>
-        </NavbarBrand>
-        <Button color="link" size="sm" onClick={handleLogout}>Cerrar sesión</Button>
-      </Navbar>
+    <main className="inventory-page">
+      <AppNavbar employee={employee} onSignOut={handleLogout} />
 
-      <Container className="py-4">
+      <Container className="inventory-content py-4 py-md-5">
+        <div className="inventory-heading">
+          <div>
+            <p className="inventory-eyebrow mb-1">CONTROL DE EXISTENCIAS</p>
+            <h1 className="inventory-title mb-1">Inventario de insumos</h1>
+            <p className="inventory-description mb-0">Consulta existencias, revisa alertas y mantén actualizado el stock de la sucursal.</p>
+          </div>
+          {canManage && (
+            <Button type="button" className="inventory-primary-button" onClick={() => setFormItem(null)}>
+              <i className="bi bi-plus-lg me-2" aria-hidden="true" />Nuevo insumo
+            </Button>
+          )}
+        </div>
+
         {/* Alertas de stock mínimo */}
         {alerts.length > 0 && (
-          <Alert color="warning">
-            <h2 className="h6 fw-bold">⚠ {alerts.length} insumo(s) requieren reabastecimiento</h2>
-            <ul className="list-inline mb-0">
+          <Alert className="inventory-alert" color="warning">
+            <h2 className="h6 fw-bold"><i className="bi bi-exclamation-triangle-fill me-2" aria-hidden="true" />{alerts.length} insumo(s) requieren reabastecimiento</h2>
+            <ul className="inventory-alert-list list-unstyled mb-0">
               {alerts.map((item) => (
-                <li key={item.id} className="list-inline-item bg-white rounded-pill px-3 py-1 mb-1 shadow-sm">
-                  {item.name}: <strong>{item.quantity}</strong>/{item.minimumStock} {item.unit}
+                <li key={item.id}>
+                  <span>{item.name}</span><strong>{item.quantity} / {item.minimumStock} {item.unit}</strong>
                 </li>
               ))}
             </ul>
@@ -164,12 +177,15 @@ export default function InventoryPage() {
 
         {/* Resumen */}
         <Row className="mb-3">
-          {summaryCards.map(([label, value, color]) => (
+          {summaryCards.map(([label, value, icon, tone]) => (
             <Col key={label} xs="4">
-              <Card className="shadow-sm">
-                <CardBody>
-                  <small className="text-muted">{label}</small>
-                  <p className={`h3 fw-bold mb-0 ${color}`}>{value}</p>
+              <Card className={`inventory-summary-card ${tone}`}>
+                <CardBody className="d-flex align-items-center gap-3">
+                  <span className="inventory-summary-icon"><i className={`bi ${icon}`} aria-hidden="true" /></span>
+                  <div>
+                    <small>{label}</small>
+                    <p className="h3 fw-bold mb-0">{value}</p>
+                  </div>
                 </CardBody>
               </Card>
             </Col>
@@ -177,15 +193,15 @@ export default function InventoryPage() {
         </Row>
 
         {/* Filtros y acción */}
-        <Card className="shadow-sm mb-3">
+        <Card className="inventory-card mb-3">
           <CardBody>
             <Row className="g-2 align-items-center">
               <Col md="5">
-                <Input placeholder="Buscar insumo..." value={filters.search}
+                <Input className="inventory-filter" aria-label="Buscar insumo" placeholder="Buscar insumo..." value={filters.search}
                   onChange={(e) => setFilters({ ...filters, search: e.target.value })} />
               </Col>
               <Col md="3">
-                <Input type="select" value={filters.type}
+                <Input className="inventory-filter" type="select" aria-label="Filtrar por tipo" value={filters.type}
                   onChange={(e) => setFilters({ ...filters, type: e.target.value })}>
                   <option value="">Todos los tipos</option>
                   {INVENTORY_TYPES.map((type) => (
@@ -197,14 +213,9 @@ export default function InventoryPage() {
                 <FormGroup check className="mb-0">
                   <Input id="lowStock" type="checkbox" checked={filters.lowStock}
                     onChange={(e) => setFilters({ ...filters, lowStock: e.target.checked })} />
-                  <Label check for="lowStock">Solo stock bajo</Label>
+                  <Label className="inventory-low-filter" check for="lowStock">Solo stock bajo</Label>
                 </FormGroup>
               </Col>
-              {canManage && (
-                <Col md="2" className="text-md-end">
-                  <Button color="warning" onClick={() => setFormItem(null)}>+ Nuevo insumo</Button>
-                </Col>
-              )}
             </Row>
           </CardBody>
         </Card>
@@ -212,7 +223,7 @@ export default function InventoryPage() {
         {notice && <Alert color="success" toggle={() => setNotice('')}>{notice}</Alert>}
         {pageError && <Alert color="danger">{pageError}</Alert>}
 
-        <Card className="shadow-sm">
+        <Card className="inventory-card inventory-table-card">
           {loading
             ? <div className="p-5 text-center"><Spinner color="secondary" /></div>
             : <InventoryTable items={items} canManage={canManage}

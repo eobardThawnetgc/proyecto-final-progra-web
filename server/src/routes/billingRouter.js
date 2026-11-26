@@ -5,7 +5,7 @@ import { createInvoice, getBillingData } from '../controllers/billing/billingCon
 
 const billingRouter = express.Router();
 
-billingRouter.use(authenticate, authorize('ADMIN', 'MANAGER', 'CASHIER'));
+billingRouter.use(authenticate, authorize('ADMIN', 'MANAGER', 'CASHIER', 'EMPLOYEE'));
 billingRouter.get('/', getBillingData);
 billingRouter.post('/', createInvoice);
 

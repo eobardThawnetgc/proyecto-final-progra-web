@@ -3,7 +3,7 @@ import { Alert, Modal, ModalBody, ModalHeader } from 'reactstrap'
 // Envuelve el Modal de Reactstrap. Se monta solo cuando hace falta, por eso isOpen es true.
 export default function AppModal({ title, onClose, children }) {
   return (
-    <Modal isOpen toggle={onClose} centered>
+    <Modal isOpen={true} toggle={onClose} centered className="inventory-modal">
       <ModalHeader toggle={onClose}>{title}</ModalHeader>
       <ModalBody>{children}</ModalBody>
     </Modal>

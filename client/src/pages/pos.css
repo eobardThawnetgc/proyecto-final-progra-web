@@ -1,0 +1,104 @@
+.pos-page {
+    min-height: 100vh;
+    background: #f3efe6;
+    color: #28392e;
+}
+
+.pos-eyebrow {
+    color: #9d603d;
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .16em;
+}
+
+.pos-title {
+    font-family: Georgia, serif;
+    font-size: clamp(1.9rem, 4vw, 2.75rem);
+}
+
+.pos-search {
+    width: min(100%, 20rem);
+}
+
+.pos-card,
+.pos-product-card {
+    border-color: #e4dfd4;
+    border-radius: .85rem;
+    background: #fffefa;
+}
+
+.pos-product-card {
+    box-shadow: 0 4px 14px rgb(45 61 49 / 5%);
+    transition: transform .16s ease, box-shadow .16s ease;
+}
+
+.pos-product-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgb(45 61 49 / 10%);
+}
+
+.pos-product-type {
+    height: fit-content;
+    color: #647067;
+}
+
+.pos-product-price {
+    color: #344c3b;
+    font-size: 1.1rem;
+}
+
+.pos-cart-card {
+    position: sticky;
+    top: 1rem;
+}
+
+.pos-cart-list {
+    max-height: 22rem;
+    overflow: auto;
+}
+
+.pos-cart-item {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .8rem 0;
+    border-bottom: 1px solid #ece8df;
+}
+
+.pos-cart-item > div:first-child {
+    display: grid;
+    gap: .2rem;
+}
+
+.pos-cart-item small {
+    color: #69776d;
+}
+
+.pos-cart-quantity {
+    min-width: 1.5rem;
+    text-align: center;
+}
+
+.pos-totals {
+    display: grid;
+    gap: .5rem;
+}
+
+.pos-totals > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.pos-total {
+    margin-top: .2rem;
+    padding-top: .65rem;
+    border-top: 1px solid #e4dfd4;
+    font-size: 1.15rem;
+}
+
+@media (max-width: 991.98px) {
+    .pos-cart-card {
+        position: static;
+    }
+}

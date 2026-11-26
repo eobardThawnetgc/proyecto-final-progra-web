@@ -8,7 +8,8 @@ const authRouter = express.Router();
 authRouter.get("/me", authenticate, (req, res) => {
     return res.status(200).json({
         message: "Usuario autenticado correctamente",
-        employee: req.employee
+        employee: req.employee,
+        sessionExpiresAt: req.sessionExpiresAt
     });
 });
 

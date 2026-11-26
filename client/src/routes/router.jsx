@@ -10,6 +10,7 @@ import { employeesService } from "../services/employeesService.js";
 import { cashService } from "../services/cashService.js";
 import { billingService } from "../services/billingService.js";
 import { productsService } from "../services/productsService.js";
+import { fetchPosProducts } from "../services/salesService.js";
 
 
 export const AppRouter = createBrowserRouter([
@@ -29,13 +30,19 @@ export const AppRouter = createBrowserRouter([
         path: "/ventas",
         loader: async () => {
             try {
-                await getCurrentUser();
-                return redirect('/facturacion');
+                const { employee } = await getCurrentUser();
+                if (!['ADMIN', 'MANAGER', 'CASHIER', 'EMPLOYEE'].includes(employee.role)) return redirect('/productos');
+                const [products, current] = await Promise.all([
+                    fetchPosProducts(), cashService.current(),
+                ]);
+                return { employee, products, hasOpenCashSession: Boolean(current.session) };
             } catch (error) {
                 if (error.status === 401) return redirect("/auth/login");
                 throw error;
             }
         },
+        lazy: async () => ({ Component: (await import('../pages/PosPage.jsx')).default }),
+        errorElement: <ErrorPage />,
     },
     {
         path: "/productos",
@@ -52,6 +59,20 @@ export const AppRouter = createBrowserRouter([
             }
         },
         lazy: async () => ({ Component: (await import('../pages/ProductsPage.jsx')).default }),
+        errorElement: <ErrorPage />,
+    },
+    {
+        path: "/inventario",
+        loader: async () => {
+            try {
+                const { employee } = await getCurrentUser();
+                return { employee };
+            } catch (error) {
+                if (error.status === 401) return redirect('/auth/login');
+                throw error;
+            }
+        },
+        lazy: async () => ({ Component: (await import('../pages/InventoryPage.jsx')).default }),
         errorElement: <ErrorPage />,
     },
     {
@@ -78,7 +99,7 @@ export const AppRouter = createBrowserRouter([
         loader: async () => {
             try {
                 const { employee } = await getCurrentUser();
-                if (!['ADMIN', 'MANAGER'].includes(employee.role)) return redirect("/compras");
+                if (!['ADMIN', 'MANAGER'].includes(employee.role)) return redirect("/productos");
                 const [{ employees: initialEmployees }, { branches }] = await Promise.all([
                     employeesService.list(), employeesService.branches(),
                 ]);
@@ -101,7 +122,7 @@ export const AppRouter = createBrowserRouter([
 
                 // Solo administradores y gerentes pueden acceder.
                 if (!["ADMIN", "MANAGER"].includes(employee.role)) {
-                    return redirect("/compras");
+                    return redirect("/productos");
                 }
 
                 // Cargamos los empleados y las planillas registradas.
@@ -131,7 +152,7 @@ export const AppRouter = createBrowserRouter([
         loader: async () => {
             try {
                 const { employee } = await getCurrentUser();
-                if (!['ADMIN', 'MANAGER', 'CASHIER'].includes(employee.role)) return redirect('/compras');
+                if (!['ADMIN', 'MANAGER', 'CASHIER', 'EMPLOYEE'].includes(employee.role)) return redirect('/productos');
                 const [current, history] = await Promise.all([
                     cashService.current(), cashService.sessions(),
                 ]);
@@ -149,7 +170,7 @@ export const AppRouter = createBrowserRouter([
         loader: async () => {
             try {
                 const { employee } = await getCurrentUser();
-                if (!['ADMIN', 'MANAGER', 'CASHIER'].includes(employee.role)) return redirect('/compras');
+                if (!['ADMIN', 'MANAGER', 'CASHIER', 'EMPLOYEE'].includes(employee.role)) return redirect('/productos');
                 return { employee, ...(await billingService.data()) };
             } catch (error) {
                 if (error.status === 401) return redirect('/auth/login');

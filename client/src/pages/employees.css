@@ -62,3 +62,39 @@
 .employees-table :is(th, td) {
     padding: .85rem 1rem;
 }
+
+.employee-form-modal .modal-dialog {
+    height: min(760px, calc(100dvh - 2rem));
+}
+
+.employee-form-modal .modal-content {
+    display: flex;
+    height: 100%;
+    max-height: 100%;
+    overflow: hidden;
+}
+
+.employee-form-modal form {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.employee-form-modal .modal-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.employee-form-modal .modal-footer {
+    flex: 0 0 auto;
+}
+
+@media (max-height: 600px) {
+    .employee-form-modal .modal-dialog {
+        height: calc(100dvh - 1rem);
+        margin-block: .5rem;
+    }
+}
