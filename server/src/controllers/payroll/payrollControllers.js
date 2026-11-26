@@ -104,3 +104,48 @@ export const createPayroll = async (req, res, next) => {
   }
 };
 
+// Obtiene las planillas registradas en PostgreSQL.
+export const getPayrolls = async (req, res, next) => {
+  try {
+    // Los gerentes consultan únicamente las planillas de su sucursal.
+    const where = req.employee.role === "ADMIN"
+      ? {}
+      : { branchId: req.employee.branchId };
+
+    // Consultamos las planillas y los datos básicos del empleado.
+    const payrolls = await prisma.payroll.findMany({
+      where,
+      include: {
+        employee: {
+          select: {
+            name: true,
+            position: true
+          }
+        }
+      },
+      orderBy: [
+        { periodStart: "desc" },
+        { employeeId: "asc" }
+      ]
+    });
+
+    // Convertimos los valores Decimal para enviarlos como números.
+    const result = payrolls.map((payroll) => ({
+      ...payroll,
+      grossSalary: Number(payroll.grossSalary),
+      isss: Number(payroll.isss),
+      afp: Number(payroll.afp),
+      incomeTax: Number(payroll.incomeTax),
+      netSalary: Number(payroll.netSalary)
+    }));
+
+    return res.status(200).json({
+      total: result.length,
+      payrolls: result
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};
+
