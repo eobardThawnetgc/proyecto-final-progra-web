@@ -8,6 +8,7 @@ import { purchasesService } from "../services/purchasesService.js";
 import { employeesService } from "../services/employeesService.js";
 import { cashService } from "../services/cashService.js";
 import { billingService } from "../services/billingService.js";
+import { productsService } from "../services/productsService.js";
 
 
 export const AppRouter = createBrowserRouter([
@@ -16,7 +17,7 @@ export const AppRouter = createBrowserRouter([
         loader: async () => {
             try {
                 const { employee } = await getCurrentUser();
-                return redirect(employee.role === 'CASHIER' ? '/caja' : '/compras');
+                return redirect(employee.role === 'CASHIER' ? '/caja' : '/productos');
             } catch (error) {
                 if (error.status === 401) return redirect('/auth/login');
                 throw error;
@@ -27,14 +28,29 @@ export const AppRouter = createBrowserRouter([
         path: "/ventas",
         loader: async () => {
             try {
-                const { employee } = await getCurrentUser();
-                return { employee };
+                await getCurrentUser();
+                return redirect('/facturacion');
             } catch (error) {
                 if (error.status === 401) return redirect("/auth/login");
                 throw error;
             }
         },
-        lazy: async () => ({ Component: (await import("../pages/PosPage.jsx")).default }),
+    },
+    {
+        path: "/productos",
+        loader: async () => {
+            try {
+                const { employee } = await getCurrentUser();
+                const [catalog, options] = await Promise.all([
+                    productsService.list({ active: 'true' }), productsService.options(),
+                ]);
+                return { employee, products: catalog.products, ...options };
+            } catch (error) {
+                if (error.status === 401) return redirect('/auth/login');
+                throw error;
+            }
+        },
+        lazy: async () => ({ Component: (await import('../pages/ProductsPage.jsx')).default }),
         errorElement: <ErrorPage />,
     },
     {

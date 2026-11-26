@@ -4,6 +4,7 @@ import { Alert, Badge, Button, Card, CardBody, Container, Form, FormGroup, Input
 import { toast } from 'sonner';
 import { logout } from '../services/authService.js';
 import { billingService } from '../services/billingService.js';
+import AppNavbar from '../components/AppNavbar.jsx';
 import './billing.css';
 
 const paymentMethods = [
@@ -89,17 +90,7 @@ export default function BillingPage() {
 
     return (
         <main className="billing-page">
-            <header className="billing-header">
-                <Container className="d-flex flex-wrap align-items-center justify-content-between gap-3 py-3">
-                    <span className="billing-brand"><i className="bi bi-cup-hot" aria-hidden="true" /> Orígenes SV</span>
-                    <div className="d-flex flex-wrap align-items-center gap-3">
-                        <Link className="billing-header-link" to="/caja">Caja</Link>
-                        {employee.role !== 'CASHIER' && <Link className="billing-header-link" to="/compras">Compras</Link>}
-                        <span>{employee.name}</span>
-                        <Button outline color="light" size="sm" onClick={signOut}>Cerrar sesión</Button>
-                    </div>
-                </Container>
-            </header>
+            <AppNavbar employee={employee} onSignOut={signOut} />
 
             <Container className="py-4 py-md-5">
                 <div className="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">

@@ -1,19 +1,11 @@
-import api from "./api";
+import { api } from './api.js';
 
 export const fetchPosProducts = async () => {
-  try {
-    const response = await api.get("/sales/products");
-    return response.data?.data ?? response.data ?? [];
-  } catch (error) {
-    throw error;
-  }
+    const result = await api('/sales/products');
+    return result.data ?? [];
 };
 
-export const createPosSale = async (salePayload) => {
-  try {
-    const response = await api.post("/sales", salePayload);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
+export const createPosSale = async (salePayload) => api('/sales', {
+    method: 'POST',
+    body: JSON.stringify(salePayload),
+});

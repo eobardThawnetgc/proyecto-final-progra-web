@@ -1,9 +1,22 @@
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useRouteError } from "react-router-dom";
 import "./errorPage.css";
 
 function ErrorPage() {
   const navigate = useNavigate();
+  const routeError = useRouteError();
+  const isConnectionError = routeError?.status === 0
+    || routeError?.message?.includes('No se pudo conectar')
+    || routeError?.message === 'Failed to fetch';
+  const status = routeError?.status || (isConnectionError ? 503 : 500);
+  const heading = isConnectionError
+    ? 'No pudimos conectar con el servidor.'
+    : status === 404 ? 'Parece que nos perdimos en el camino.' : 'Algo salió mal al cargar esta página.';
+  const description = isConnectionError
+    ? 'La aplicación no recibió respuesta del backend. Comprueba que el servidor esté iniciado en el puerto 3000 y vuelve a intentarlo.'
+    : status === 404
+      ? 'La página que buscas no existe o ha cambiado de ubicación. Puedes volver al inicio.'
+      : 'Ocurrió un problema al cargar la información. Intenta recargar la página.';
 
   return (
     <main className="error-page">
@@ -19,51 +32,44 @@ function ErrorPage() {
           </div>
         </div>
 
-        <span className="error-code-label">
-          ERROR 404
-        </span>
+        <span className="error-code-label">{isConnectionError ? 'SIN CONEXIÓN' : `ERROR ${status}`}</span>
       </header>
 
       <section className="error-content">
-        <span className="error-number">404</span>
+        <span className="error-number">{isConnectionError ? '503' : status}</span>
 
         <h1>
-          Parece que nos perdimos
-          <br />
-          en el camino.
+          {heading}
         </h1>
 
         <p className="error-description">
-          La página que buscas no existe o ha cambiado
-          de ubicación. Pero tranquilo, podemos encontrar
-          el camino de regreso.
+          {description}
         </p>
 
         <div className="error-message">
           <i className="bi bi-cup-hot"></i>
 
-          <span>UNA PAUSA EN EL CAMINO</span>
+            <span>{isConnectionError ? 'SERVIDOR SIN RESPUESTA' : 'UNA PAUSA EN EL CAMINO'}</span>
 
           <h3>
-            Todo buen origen merece
-            un nuevo comienzo.
+            {isConnectionError ? 'Inicia el backend y vuelve a cargar.' : 'Todo buen origen merece un nuevo comienzo.'}
           </h3>
         </div>
 
         <div className="error-actions">
           <button
             className="error-button"
-            onClick={() => navigate("/")}
+            onClick={() => window.location.reload()}
           >
-            <i className="bi bi-house"></i>
-            Volver al inicio
+            <i className={`bi ${isConnectionError ? 'bi-arrow-clockwise' : 'bi-house'}`}></i>
+            {isConnectionError ? 'Reintentar conexión' : 'Recargar página'}
           </button>
 
           <button
             className="error-back"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/")}
           >
-            Regresar
+            Volver al inicio
           </button>
         </div>
       </section>

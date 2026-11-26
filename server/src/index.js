@@ -3,11 +3,12 @@ import "dotenv/config";
 import app from "./app.js";
 
 const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || "127.0.0.1";
 
 const startServer = () => {
     try {
-        app.listen(PORT, () => {
-            console.log(`Servidor: http://localhost:${PORT}`);
+        app.listen(PORT, HOST, () => {
+            console.log(`Servidor: http://${HOST}:${PORT}`);
             console.log("Estado: En ejecución");
         });
 

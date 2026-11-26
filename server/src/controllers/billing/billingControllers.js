@@ -121,7 +121,10 @@ export const createInvoice = async (req, res, next) => {
                     branchId: req.employee.branchId,
                     active: true,
                 },
-                select: { id: true, price: true },
+                include: {
+                    recipeItems: { select: { inventoryItemId: true, quantity: true } },
+                    inventoryItem: { select: { id: true, name: true, unit: true, quantity: true } },
+                },
             });
             if (products.length !== productIds.length) {
                 return { status: 400, message: 'Uno o más productos no están disponibles en esta sucursal' };
@@ -143,12 +146,54 @@ export const createInvoice = async (req, res, next) => {
             const documentNumber = currentNumber + 1;
             const counterField = parsed.data.documentType === 'CCF' ? 'lastCcf' : 'lastConsumerInvoice';
 
+            // Agrupa las necesidades para validar y descontar existencias en la misma transacción.
+            const requiredStock = new Map();
+            for (const requested of parsed.data.details) {
+                const product = productsById.get(requested.productId);
+                const quantity = new Prisma.Decimal(requested.quantity);
+                const lines = product.type === 'PREPARED'
+                    ? product.recipeItems.map((line) => ({ id: line.inventoryItemId, quantity: new Prisma.Decimal(line.quantity).times(quantity) }))
+                    : product.inventoryItem ? [{ id: product.inventoryItem.id, quantity }] : [];
+                if (!lines.length) return { status: 409, message: `El producto ${product.id} no tiene receta o existencia vinculada` };
+                for (const line of lines) {
+                    const previous = requiredStock.get(line.id);
+                    requiredStock.set(line.id, previous ? previous.plus(line.quantity) : line.quantity);
+                }
+            }
+
+            const inventoryIds = [...requiredStock.keys()].sort((a, b) => a - b);
+            if (inventoryIds.length) {
+                await tx.$queryRaw`SELECT id FROM "InventoryItem" WHERE id IN (${Prisma.join(inventoryIds)}) ORDER BY id FOR UPDATE`;
+            }
+            const inventoryItems = await tx.inventoryItem.findMany({
+                where: { id: { in: inventoryIds }, branchId: req.employee.branchId },
+                select: { id: true, name: true, unit: true, quantity: true },
+            });
+            const inventoryById = new Map(inventoryItems.map((item) => [item.id, item]));
+            const shortages = inventoryIds.filter((id) => !inventoryById.has(id)
+                || inventoryById.get(id).quantity.lessThan(requiredStock.get(id))).map((id) => ({
+                id,
+                name: inventoryById.get(id)?.name ?? 'Insumo no disponible',
+                available: inventoryById.get(id)?.quantity.toString() ?? '0',
+                required: requiredStock.get(id).toString(),
+                unit: inventoryById.get(id)?.unit ?? '',
+            }));
+            if (shortages.length) return { status: 409, message: 'Existencia insuficiente para completar la venta', shortages };
+
             const updated = await tx.branch.updateMany({
                 where: { id: req.employee.branchId, [counterField]: currentNumber },
                 data: { [counterField]: documentNumber },
             });
             if (updated.count !== 1) {
                 return { status: 409, message: 'El correlativo cambió. Intenta emitir la factura de nuevo' };
+            }
+
+            for (const id of inventoryIds) {
+                const { count } = await tx.inventoryItem.updateMany({
+                    where: { id, branchId: req.employee.branchId, quantity: { gte: requiredStock.get(id) } },
+                    data: { quantity: { decrement: requiredStock.get(id) } },
+                });
+                if (count !== 1) throw Object.assign(new Error('El inventario cambió durante la venta'), { code: 'STOCK_CHANGED' });
             }
 
             const sale = await tx.sale.create({
@@ -180,6 +225,9 @@ export const createInvoice = async (req, res, next) => {
             sale: serializeInvoice(result.sale),
         });
     } catch (error) {
+        if (error.code === 'P2034' || error.code === 'STOCK_CHANGED') {
+            return res.status(409).json({ message: 'El inventario cambió durante la operación. Actualiza e inténtalo de nuevo' });
+        }
         next(error);
     }
 };

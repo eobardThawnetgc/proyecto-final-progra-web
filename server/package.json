@@ -5,7 +5,8 @@
   "main": "./src/index.js",
   "scripts": {
     "test": "node --test",
-    "dev": "node --watch src/index.js"
+    "dev": "node --watch src/index.js",
+    "seed": "node scripts/data.js"
   },
   "keywords": [],
   "author": "",

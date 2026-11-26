@@ -1,5 +1,5 @@
 import { Fragment, useCallback, useState } from 'react';
-import { Link, useLoaderData, useNavigate } from 'react-router-dom';
+import { useLoaderData, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
     Alert, Badge, Button, Card, CardBody, Container, Form, FormGroup,
@@ -7,6 +7,7 @@ import {
 } from 'reactstrap';
 import { logout } from '../services/authService.js';
 import { cashService } from '../services/cashService.js';
+import AppNavbar from '../components/AppNavbar.jsx';
 import './cash.css';
 
 const paymentMethods = [
@@ -99,21 +100,9 @@ export default function CashPage() {
         );
     }
 
-    const canSeePurchases = ['ADMIN', 'MANAGER'].includes(employee.role);
-
     return (
         <main className="cash-page">
-            <header className="cash-header">
-                <Container className="d-flex flex-wrap align-items-center justify-content-between gap-3 py-3">
-                    <span className="cash-brand"><i className="bi bi-cup-hot" aria-hidden="true" /> Orígenes SV</span>
-                    <div className="d-flex flex-wrap align-items-center gap-3">
-                        <Link className="cash-header-link" to="/facturacion">Facturación</Link>
-                        {canSeePurchases && <Link className="cash-header-link" to="/compras">Compras</Link>}
-                        <span>{employee.name}</span>
-                        <Button outline color="light" size="sm" onClick={signOut}>Cerrar sesión</Button>
-                    </div>
-                </Container>
-            </header>
+            <AppNavbar employee={employee} onSignOut={signOut} />
 
             <Container className="py-4 py-md-5">
                 <div className="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">

@@ -4,30 +4,6 @@
     color: #28392e;
 }
 
-.cash-header {
-    background: #344c3b;
-    color: #fffefa;
-}
-
-.cash-brand {
-    font-weight: 700;
-    letter-spacing: .04em;
-}
-
-.cash-brand i {
-    margin-right: .45rem;
-}
-
-.cash-header-link {
-    color: #fffefa;
-    text-decoration: none;
-}
-
-.cash-header-link:hover {
-    color: #dce9dc;
-    text-decoration: underline;
-}
-
 .cash-title {
     font-family: Georgia, serif;
     font-size: clamp(1.9rem, 4vw, 2.75rem);

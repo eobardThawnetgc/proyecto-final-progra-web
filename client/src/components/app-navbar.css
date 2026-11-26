@@ -1,0 +1,95 @@
+.app-navbar {
+    background: #344c3b;
+    color: #fffefa;
+}
+
+.app-navbar-inner {
+    min-height: 64px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 24px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+
+.app-navbar-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #fffefa;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.app-navbar-brand:hover {
+    color: #dce9dc;
+}
+
+.app-navbar-brand i {
+    font-size: 17px;
+}
+
+.app-navbar-navigation {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 18px;
+}
+
+.app-navbar-link {
+    padding: 5px 0;
+    color: #fffefa;
+    font-size: 14px;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.app-navbar-link:hover,
+.app-navbar-link.active {
+    color: #dce9dc;
+    text-decoration: underline;
+    text-underline-offset: 5px;
+}
+
+.app-navbar-user {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 2px;
+    padding-left: 16px;
+    border-left: 1px solid rgb(255 254 250 / 28%);
+    color: #fffefa;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.app-navbar-user i {
+    font-size: 17px;
+}
+
+.app-navbar-signout {
+    white-space: nowrap;
+}
+
+@media (max-width: 650px) {
+    .app-navbar-inner {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .app-navbar-navigation {
+        width: 100%;
+        gap: 6px 14px;
+    }
+
+    .app-navbar-user {
+        margin-left: 0;
+        padding-left: 0;
+        border-left: 0;
+    }
+}

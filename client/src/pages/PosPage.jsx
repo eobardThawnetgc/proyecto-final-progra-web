@@ -20,7 +20,7 @@ export default function PosPage() {
         setFeedback({
           type: "error",
           message:
-            err?.response?.data?.message ||
+          err?.message ||
             "No se pudieron cargar los productos del menú.",
         });
       } finally {
@@ -115,7 +115,7 @@ export default function PosPage() {
     } catch (err) {
       setFeedback({
         type: "error",
-        message: err?.response?.data?.message || "Error al registrar la venta.",
+        message: err?.message || "Error al registrar la venta.",
       });
     } finally {
       setSubmittingSale(false);
