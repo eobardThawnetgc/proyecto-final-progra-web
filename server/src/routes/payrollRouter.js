@@ -5,7 +5,8 @@ import { authorize } from "../middleware/roleMiddleware.js";
 
 import {
   getPayrollEmployees,
-  createPayroll
+  createPayroll,
+  getPayrolls
 } from "../controllers/payroll/payrollControllers.js";
 
 const payrollRouter = express.Router();
@@ -26,5 +27,13 @@ payrollRouter.post(
   authorize("ADMIN", "MANAGER"),
   createPayroll
 );
+
+// Permite consultar las planillas registradas.
+payrollRouter.get(
+  "/",
+  authorize("ADMIN", "MANAGER"),
+  getPayrolls
+);
+
 
 export default payrollRouter;
