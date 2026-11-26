@@ -6,6 +6,7 @@ import LoginPage from "../pages/auth/login";
 import { getCurrentUser } from "../services/authService.js";
 import { purchasesService } from "../services/purchasesService.js";
 import { cashService } from "../services/cashService.js";
+import { billingService } from "../services/billingService.js";
 
 
 export const AppRouter = createBrowserRouter([
@@ -70,6 +71,21 @@ export const AppRouter = createBrowserRouter([
             }
         },
         lazy: async () => ({ Component: (await import("../pages/CashPage.jsx")).default }),
+        errorElement: <ErrorPage />,
+    },
+    {
+        path: "/facturacion",
+        loader: async () => {
+            try {
+                const { employee } = await getCurrentUser();
+                if (!['ADMIN', 'MANAGER', 'CASHIER'].includes(employee.role)) return redirect('/compras');
+                return { employee, ...(await billingService.data()) };
+            } catch (error) {
+                if (error.status === 401) return redirect('/auth/login');
+                throw error;
+            }
+        },
+        lazy: async () => ({ Component: (await import("../pages/BillingPage.jsx")).default }),
         errorElement: <ErrorPage />,
     },
     {
