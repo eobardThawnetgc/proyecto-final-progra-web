@@ -88,7 +88,7 @@ export function calcularAFPQuincenal(salarioMensual, numeroQuincena) {
  * del Decreto Ejecutivo N.º 10 de El Salvador.
  * Recibe el salario gravado después de ISSS y AFP.
  */
-export function calcularISRQuincenal(baseGravada) {
+export function calcularISRQuincenal(baseGravada, salarioAnual = null) {
   const base = Number(baseGravada);
 
   // Validamos que el monto recibido sea correcto.
@@ -97,7 +97,15 @@ export function calcularISRQuincenal(baseGravada) {
   }
 
   // Convertimos a centavos para evitar errores decimales.
-  const centavos = Math.round(base * 100);
+  let centavos = Math.round(base * 100);
+
+  // El Decreto Ejecutivo 10 contempla una deducción anual de $1,600
+  // para asalariados con ingresos anuales de hasta $9,100. Distribuimos
+  // esa deducción entre las 24 quincenas y el recálculo la concilia.
+  const ingresoAnual = Number(salarioAnual);
+  if (salarioAnual !== null && Number.isFinite(ingresoAnual) && ingresoAnual <= 9100) {
+    centavos = Math.max(0, centavos - Math.round(160000 / 24));
+  }
 
   // Primer tramo: sin retención de renta.
   if (centavos <= 27500) {
@@ -153,7 +161,7 @@ export function calcularSalarioNetoQuincenal(salarioMensual, numeroQuincena) {
   );
 
   const baseGravada = baseGravadaCentavos / 100;
-  const isr = calcularISRQuincenal(baseGravada);
+  const isr = calcularISRQuincenal(baseGravada, Number(salarioMensual) * 12);
 
   // Calculamos el salario neto evitando errores con decimales.
   const salarioNeto =

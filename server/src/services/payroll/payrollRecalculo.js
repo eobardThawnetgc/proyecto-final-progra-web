@@ -5,7 +5,8 @@
  */
 export function calcularRecalculoISRJunio(
   baseGravadaAcumulada,
-  isrRetenidoAnteriormente
+  isrRetenidoAnteriormente,
+  salarioAnual = null
 ) {
   const base = Number(baseGravadaAcumulada);
   const retenido = Number(isrRetenidoAnteriormente);
@@ -21,8 +22,14 @@ export function calcularRecalculoISRJunio(
   }
 
   // Trabajamos en centavos para evitar errores decimales.
-  const baseCentavos = Math.round(base * 100);
+  let baseCentavos = Math.round(base * 100);
   const retenidoCentavos = Math.round(retenido * 100);
+
+  // En junio corresponde la mitad de la deducción anual de $1,600.
+  const ingresoAnual = Number(salarioAnual);
+  if (salarioAnual !== null && Number.isFinite(ingresoAnual) && ingresoAnual <= 9100) {
+    baseCentavos = Math.max(0, baseCentavos - 80000);
+  }
 
   let impuestoCentavos = 0;
 
@@ -58,7 +65,8 @@ export function calcularRecalculoISRJunio(
  */
 export function calcularRecalculoISRDiciembre(
   baseGravadaAcumulada,
-  isrRetenidoAnteriormente
+  isrRetenidoAnteriormente,
+  salarioAnual = null
 ) {
   const base = Number(baseGravadaAcumulada);
   const retenido = Number(isrRetenidoAnteriormente);
@@ -74,8 +82,14 @@ export function calcularRecalculoISRDiciembre(
   }
 
   // Trabajamos en centavos.
-  const baseCentavos = Math.round(base * 100);
+  let baseCentavos = Math.round(base * 100);
   const retenidoCentavos = Math.round(retenido * 100);
+
+  // En diciembre se considera la deducción anual completa de $1,600.
+  const ingresoAnual = Number(salarioAnual);
+  if (salarioAnual !== null && Number.isFinite(ingresoAnual) && ingresoAnual <= 9100) {
+    baseCentavos = Math.max(0, baseCentavos - 160000);
+  }
 
   let impuestoCentavos = 0;
 

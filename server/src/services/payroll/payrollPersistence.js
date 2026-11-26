@@ -149,7 +149,8 @@ export async function guardarPlanillaQuincenal(
       const totalJunio = centavos(
         calcularRecalculoISRJunio(
           baseAcumulada / 100,
-          retenidoAnterior / 100
+          retenidoAnterior / 100,
+          Number(empleado.salary) * 12
         )
       );
 
@@ -248,7 +249,8 @@ export async function guardarPlanillaQuincenal(
       const totalDiciembre = centavos(
         calcularRecalculoISRDiciembre(
           baseAcumulada / 100,
-          retenidoAnterior / 100
+          retenidoAnterior / 100,
+          Number(empleado.salary) * 12
         )
       );
 

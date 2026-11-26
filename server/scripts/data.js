@@ -15,6 +15,7 @@ const supplies = [
     { name: 'Tapadera 16oz', type: 'SUPPLY', unit: 'unidad', quantity: 200, minimumStock: 50 },
     { name: 'Vaso 12oz', type: 'SUPPLY', unit: 'unidad', quantity: 200, minimumStock: 50 },
     { name: 'Tapadera 12oz', type: 'SUPPLY', unit: 'unidad', quantity: 200, minimumStock: 50 },
+    { name: 'Agua embotellada 600 ml', type: 'PACKAGED', unit: 'unidad', quantity: 120, minimumStock: 24 },
     { name: 'Viñeta', type: 'SUPPLY', unit: 'unidad', quantity: 200, minimumStock: 50 },
 ];
 
@@ -34,10 +35,13 @@ const preparedMenu = [
 ];
 
 const main = async () => {
-    let branch = await prisma.branch.findFirst({ where: { name: 'Sucursal Central' } });
-    if (!branch) {
-        branch = await prisma.branch.create({ data: { name: 'Sucursal Central', address: 'San Salvador' } });
-    }
+    const ensureBranch = async (name, address) => {
+        const existing = await prisma.branch.findFirst({ where: { name } });
+        return existing ?? prisma.branch.create({ data: { name, address } });
+    };
+
+    const branch = await ensureBranch('Sucursal Central', 'San Salvador');
+    await ensureBranch('Sucursal San Miguel', 'San Miguel');
 
     const branches = await prisma.branch.findMany({ orderBy: { id: 'asc' } });
 
@@ -69,24 +73,92 @@ const main = async () => {
         }
     }
 
-    const inventory = await prisma.inventoryItem.findMany({ where: { branchId: branch.id } });
-    const byName = new Map(inventory.map((item) => [item.name.toLowerCase(), item]));
-    for (const menuItem of preparedMenu) {
-        const existingProduct = await prisma.product.findFirst({ where: { branchId: branch.id, name: menuItem.name } });
-        const product = existingProduct
-            ? await prisma.product.update({ where: { id: existingProduct.id }, data: { description: menuItem.description, type: 'PREPARED', price: menuItem.price, active: true } })
-            : await prisma.product.create({ data: { branchId: branch.id, name: menuItem.name, description: menuItem.description, type: 'PREPARED', price: menuItem.price } });
-        await prisma.recipeItem.deleteMany({ where: { productId: product.id } });
-        await prisma.recipeItem.createMany({
-            data: menuItem.recipe.map(([name, quantity]) => ({
-                productId: product.id,
-                inventoryItemId: byName.get(name.toLowerCase()).id,
-                quantity,
-            })),
+    for (const currentBranch of branches) {
+        const inventory = await prisma.inventoryItem.findMany({ where: { branchId: currentBranch.id } });
+        const byName = new Map(inventory.map((item) => [item.name.toLowerCase(), item]));
+
+        for (const menuItem of preparedMenu) {
+            const existingProduct = await prisma.product.findFirst({
+                where: { branchId: currentBranch.id, name: menuItem.name },
+            });
+            const product = existingProduct
+                ? await prisma.product.update({
+                    where: { id: existingProduct.id },
+                    data: { description: menuItem.description, type: 'PREPARED', price: menuItem.price, active: true },
+                })
+                : await prisma.product.create({
+                    data: {
+                        branchId: currentBranch.id,
+                        name: menuItem.name,
+                        description: menuItem.description,
+                        type: 'PREPARED',
+                        price: menuItem.price,
+                    },
+                });
+
+            await prisma.recipeItem.deleteMany({ where: { productId: product.id } });
+            await prisma.recipeItem.createMany({
+                data: menuItem.recipe.map(([name, quantity]) => {
+                    const ingredient = byName.get(name.toLowerCase());
+                    if (!ingredient) throw new Error(`Falta el insumo "${name}" en ${currentBranch.name}`);
+                    return { productId: product.id, inventoryItemId: ingredient.id, quantity };
+                }),
+            });
+        }
+
+        const packagedInventory = byName.get('agua embotellada 600 ml');
+        if (!packagedInventory) {
+            throw new Error(`Falta el inventario de agua embotellada en ${currentBranch.name}`);
+        }
+
+        const packagedProduct = await prisma.product.findFirst({
+            where: { branchId: currentBranch.id, name: 'Agua embotellada 600 ml' },
         });
+
+        if (!packagedProduct) {
+            await prisma.product.create({
+                data: {
+                    branchId: currentBranch.id,
+                    name: 'Agua embotellada 600 ml',
+                    description: 'Agua embotellada para reventa.',
+                    type: 'PACKAGED',
+                    price: 1.25,
+                    inventoryItem: { connect: { id: packagedInventory.id } },
+                },
+            });
+        } else {
+            const linkedInventory = await prisma.inventoryItem.findFirst({
+                where: { productId: packagedProduct.id },
+                select: { id: true },
+            });
+
+            if (linkedInventory && linkedInventory.id !== packagedInventory.id) {
+                await prisma.inventoryItem.update({
+                    where: { id: linkedInventory.id },
+                    data: { productId: null },
+                });
+            }
+
+            await prisma.product.update({
+                where: { id: packagedProduct.id },
+                data: {
+                    description: 'Agua embotellada para reventa.',
+                    type: 'PACKAGED',
+                    price: 1.25,
+                    active: true,
+                },
+            });
+
+            if (packagedInventory.productId !== packagedProduct.id) {
+                await prisma.inventoryItem.update({
+                    where: { id: packagedInventory.id },
+                    data: { productId: packagedProduct.id },
+                });
+            }
+        }
     }
 
-    console.log(`Seed listo: ${insertedSupplyCount} ingredientes/insumos agregados en ${branches.length} sucursal(es).`);
+    console.log(`Seed listo: ${insertedSupplyCount} ingredientes/insumos agregados; menú y producto empacado preparados para ${branches.length} sucursal(es).`);
 };
 
 main()
