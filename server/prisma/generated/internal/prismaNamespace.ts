@@ -1575,6 +1575,10 @@ export const CashSessionScalarFieldEnum = {
   employeeId: 'employeeId',
   openingAmount: 'openingAmount',
   closingAmount: 'closingAmount',
+  closingCardAmount: 'closingCardAmount',
+  closingDigitalAmount: 'closingDigitalAmount',
+  closingBitcoinAmount: 'closingBitcoinAmount',
+  closingChivoWalletAmount: 'closingChivoWalletAmount',
   openedAt: 'openedAt',
   closedAt: 'closedAt',
   status: 'status'

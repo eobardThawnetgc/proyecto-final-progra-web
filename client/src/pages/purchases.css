@@ -1,0 +1,103 @@
+.purchases-page {
+    min-height: 100vh;
+    background: #f3efe6;
+    color: #28392e;
+}
+
+.purchases-header {
+    background: #344c3b;
+    color: #fffefa;
+}
+
+.purchases-brand {
+    font-weight: 700;
+    letter-spacing: .04em;
+}
+
+.purchases-brand i {
+    margin-right: .45rem;
+}
+
+.purchases-cash-link {
+    color: #fffefa;
+    text-decoration: none;
+}
+
+.purchases-cash-link:hover {
+    color: #dce9dc;
+    text-decoration: underline;
+}
+
+.purchase-title {
+    font-family: Georgia, serif;
+    font-size: clamp(1.9rem, 4vw, 2.75rem);
+}
+
+.purchase-card {
+    border-color: #e4dfd4;
+    border-radius: .85rem;
+    background: #fffefa;
+}
+
+.purchase-tab {
+    border: 0;
+    border-bottom: 3px solid transparent;
+    padding: .5rem .75rem .65rem;
+    color: #43564a;
+    background: transparent;
+}
+
+.purchase-tab[aria-pressed="true"] {
+    border-bottom-color: #344c3b;
+    font-weight: 700;
+}
+
+.purchase-primary.btn {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: #344c3b;
+    --bs-btn-border-color: #344c3b;
+    --bs-btn-hover-bg: #24392b;
+    --bs-btn-hover-border-color: #24392b;
+    --bs-btn-active-bg: #24392b;
+    --bs-btn-active-border-color: #24392b;
+    --bs-btn-disabled-bg: #344c3b;
+    --bs-btn-disabled-border-color: #344c3b;
+}
+
+.purchase-table {
+    --bs-table-bg: #fffefa;
+}
+
+.purchase-table thead {
+    --bs-table-bg: #f8f5ee;
+}
+
+.purchase-table :is(th, td) {
+    padding: .85rem 1rem;
+}
+
+.purchase-line {
+    background: #faf8f2;
+}
+
+.purchase-modal > form {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.purchase-totals {
+    display: grid;
+    gap: .6rem;
+}
+
+.purchase-totals > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.purchase-totals dd {
+    margin: 0;
+}

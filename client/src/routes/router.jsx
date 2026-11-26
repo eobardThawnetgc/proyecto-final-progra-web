@@ -1,29 +1,70 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, redirect } from "react-router-dom";
 import ErrorPage from "../pages/error/errorPage";
 
 import AuthLayout from "../layout/authLayout";
 import LoginPage from "../pages/auth/login";
+import { getCurrentUser } from "../services/authService.js";
+import { purchasesService } from "../services/purchasesService.js";
+import { cashService } from "../services/cashService.js";
 
 
 export const AppRouter = createBrowserRouter([
+    {
+        path: "/dashboard",
+        loader: async () => {
+            try {
+                const { employee } = await getCurrentUser();
+                return redirect(employee.role === 'CASHIER' ? '/caja' : '/compras');
+            } catch (error) {
+                if (error.status === 401) return redirect('/auth/login');
+                throw error;
+            }
+        },
+    },
+    {
+        path: "/compras",
+        loader: async () => {
+            try {
+                const { employee } = await getCurrentUser();
+                if (!['ADMIN', 'MANAGER'].includes(employee.role)) return { employee };
+
+                const [{ purchases }, { suppliers }, { branches }] = await Promise.all([
+                    purchasesService.list(), purchasesService.suppliers(), purchasesService.branches(),
+                ]);
+                return { employee, purchases, suppliers, branches };
+            } catch (error) {
+                if (error.status === 401) return redirect("/auth/login");
+                throw error;
+            }
+        },
+        lazy: async () => ({ Component: (await import("../pages/PurchasesPage.jsx")).default }),
+        errorElement: <ErrorPage />,
+    },
+    {
+        path: "/caja",
+        loader: async () => {
+            try {
+                const { employee } = await getCurrentUser();
+                if (!['ADMIN', 'MANAGER', 'CASHIER'].includes(employee.role)) return redirect('/compras');
+                const [current, history] = await Promise.all([
+                    cashService.current(), cashService.sessions(),
+                ]);
+                return { employee, session: current.session, sessions: history.sessions };
+            } catch (error) {
+                if (error.status === 401) return redirect('/auth/login');
+                throw error;
+            }
+        },
+        lazy: async () => ({ Component: (await import("../pages/CashPage.jsx")).default }),
+        errorElement: <ErrorPage />,
+    },
     {
         path: "*",
         element: <ErrorPage />
     },
     {
         path: "/",
-        element: <></>, //general layout
-        errorElement: <ErrorPage />,
-        children: [
-            {
-                path: "/",
-                element: <></>
-            },
-            {
-                path: "/",
-                element: <></>
-            },
-        ]
+        loader: () => redirect("/dashboard"),
     },
     {
         path: "/auth",

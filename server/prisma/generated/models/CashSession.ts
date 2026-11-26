@@ -32,6 +32,10 @@ export type CashSessionAvgAggregateOutputType = {
   employeeId: number | null
   openingAmount: runtime.Decimal | null
   closingAmount: runtime.Decimal | null
+  closingCardAmount: runtime.Decimal | null
+  closingDigitalAmount: runtime.Decimal | null
+  closingBitcoinAmount: runtime.Decimal | null
+  closingChivoWalletAmount: runtime.Decimal | null
 }
 
 export type CashSessionSumAggregateOutputType = {
@@ -40,6 +44,10 @@ export type CashSessionSumAggregateOutputType = {
   employeeId: number | null
   openingAmount: runtime.Decimal | null
   closingAmount: runtime.Decimal | null
+  closingCardAmount: runtime.Decimal | null
+  closingDigitalAmount: runtime.Decimal | null
+  closingBitcoinAmount: runtime.Decimal | null
+  closingChivoWalletAmount: runtime.Decimal | null
 }
 
 export type CashSessionMinAggregateOutputType = {
@@ -48,6 +56,10 @@ export type CashSessionMinAggregateOutputType = {
   employeeId: number | null
   openingAmount: runtime.Decimal | null
   closingAmount: runtime.Decimal | null
+  closingCardAmount: runtime.Decimal | null
+  closingDigitalAmount: runtime.Decimal | null
+  closingBitcoinAmount: runtime.Decimal | null
+  closingChivoWalletAmount: runtime.Decimal | null
   openedAt: Date | null
   closedAt: Date | null
   status: $Enums.CashStatus | null
@@ -59,6 +71,10 @@ export type CashSessionMaxAggregateOutputType = {
   employeeId: number | null
   openingAmount: runtime.Decimal | null
   closingAmount: runtime.Decimal | null
+  closingCardAmount: runtime.Decimal | null
+  closingDigitalAmount: runtime.Decimal | null
+  closingBitcoinAmount: runtime.Decimal | null
+  closingChivoWalletAmount: runtime.Decimal | null
   openedAt: Date | null
   closedAt: Date | null
   status: $Enums.CashStatus | null
@@ -70,6 +86,10 @@ export type CashSessionCountAggregateOutputType = {
   employeeId: number
   openingAmount: number
   closingAmount: number
+  closingCardAmount: number
+  closingDigitalAmount: number
+  closingBitcoinAmount: number
+  closingChivoWalletAmount: number
   openedAt: number
   closedAt: number
   status: number
@@ -83,6 +103,10 @@ export type CashSessionAvgAggregateInputType = {
   employeeId?: true
   openingAmount?: true
   closingAmount?: true
+  closingCardAmount?: true
+  closingDigitalAmount?: true
+  closingBitcoinAmount?: true
+  closingChivoWalletAmount?: true
 }
 
 export type CashSessionSumAggregateInputType = {
@@ -91,6 +115,10 @@ export type CashSessionSumAggregateInputType = {
   employeeId?: true
   openingAmount?: true
   closingAmount?: true
+  closingCardAmount?: true
+  closingDigitalAmount?: true
+  closingBitcoinAmount?: true
+  closingChivoWalletAmount?: true
 }
 
 export type CashSessionMinAggregateInputType = {
@@ -99,6 +127,10 @@ export type CashSessionMinAggregateInputType = {
   employeeId?: true
   openingAmount?: true
   closingAmount?: true
+  closingCardAmount?: true
+  closingDigitalAmount?: true
+  closingBitcoinAmount?: true
+  closingChivoWalletAmount?: true
   openedAt?: true
   closedAt?: true
   status?: true
@@ -110,6 +142,10 @@ export type CashSessionMaxAggregateInputType = {
   employeeId?: true
   openingAmount?: true
   closingAmount?: true
+  closingCardAmount?: true
+  closingDigitalAmount?: true
+  closingBitcoinAmount?: true
+  closingChivoWalletAmount?: true
   openedAt?: true
   closedAt?: true
   status?: true
@@ -121,6 +157,10 @@ export type CashSessionCountAggregateInputType = {
   employeeId?: true
   openingAmount?: true
   closingAmount?: true
+  closingCardAmount?: true
+  closingDigitalAmount?: true
+  closingBitcoinAmount?: true
+  closingChivoWalletAmount?: true
   openedAt?: true
   closedAt?: true
   status?: true
@@ -219,6 +259,10 @@ export type CashSessionGroupByOutputType = {
   employeeId: number
   openingAmount: runtime.Decimal
   closingAmount: runtime.Decimal | null
+  closingCardAmount: runtime.Decimal | null
+  closingDigitalAmount: runtime.Decimal | null
+  closingBitcoinAmount: runtime.Decimal | null
+  closingChivoWalletAmount: runtime.Decimal | null
   openedAt: Date
   closedAt: Date | null
   status: $Enums.CashStatus
@@ -253,6 +297,10 @@ export type CashSessionWhereInput = {
   employeeId?: Prisma.IntFilter<"CashSession"> | number
   openingAmount?: Prisma.DecimalFilter<"CashSession"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   closingAmount?: Prisma.DecimalNullableFilter<"CashSession"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingCardAmount?: Prisma.DecimalNullableFilter<"CashSession"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingDigitalAmount?: Prisma.DecimalNullableFilter<"CashSession"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingBitcoinAmount?: Prisma.DecimalNullableFilter<"CashSession"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingChivoWalletAmount?: Prisma.DecimalNullableFilter<"CashSession"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   openedAt?: Prisma.DateTimeFilter<"CashSession"> | Date | string
   closedAt?: Prisma.DateTimeNullableFilter<"CashSession"> | Date | string | null
   status?: Prisma.EnumCashStatusFilter<"CashSession"> | $Enums.CashStatus
@@ -267,6 +315,10 @@ export type CashSessionOrderByWithRelationInput = {
   employeeId?: Prisma.SortOrder
   openingAmount?: Prisma.SortOrder
   closingAmount?: Prisma.SortOrderInput | Prisma.SortOrder
+  closingCardAmount?: Prisma.SortOrderInput | Prisma.SortOrder
+  closingDigitalAmount?: Prisma.SortOrderInput | Prisma.SortOrder
+  closingBitcoinAmount?: Prisma.SortOrderInput | Prisma.SortOrder
+  closingChivoWalletAmount?: Prisma.SortOrderInput | Prisma.SortOrder
   openedAt?: Prisma.SortOrder
   closedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -284,6 +336,10 @@ export type CashSessionWhereUniqueInput = Prisma.AtLeast<{
   employeeId?: Prisma.IntFilter<"CashSession"> | number
   openingAmount?: Prisma.DecimalFilter<"CashSession"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   closingAmount?: Prisma.DecimalNullableFilter<"CashSession"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingCardAmount?: Prisma.DecimalNullableFilter<"CashSession"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingDigitalAmount?: Prisma.DecimalNullableFilter<"CashSession"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingBitcoinAmount?: Prisma.DecimalNullableFilter<"CashSession"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingChivoWalletAmount?: Prisma.DecimalNullableFilter<"CashSession"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   openedAt?: Prisma.DateTimeFilter<"CashSession"> | Date | string
   closedAt?: Prisma.DateTimeNullableFilter<"CashSession"> | Date | string | null
   status?: Prisma.EnumCashStatusFilter<"CashSession"> | $Enums.CashStatus
@@ -298,6 +354,10 @@ export type CashSessionOrderByWithAggregationInput = {
   employeeId?: Prisma.SortOrder
   openingAmount?: Prisma.SortOrder
   closingAmount?: Prisma.SortOrderInput | Prisma.SortOrder
+  closingCardAmount?: Prisma.SortOrderInput | Prisma.SortOrder
+  closingDigitalAmount?: Prisma.SortOrderInput | Prisma.SortOrder
+  closingBitcoinAmount?: Prisma.SortOrderInput | Prisma.SortOrder
+  closingChivoWalletAmount?: Prisma.SortOrderInput | Prisma.SortOrder
   openedAt?: Prisma.SortOrder
   closedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -317,6 +377,10 @@ export type CashSessionScalarWhereWithAggregatesInput = {
   employeeId?: Prisma.IntWithAggregatesFilter<"CashSession"> | number
   openingAmount?: Prisma.DecimalWithAggregatesFilter<"CashSession"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   closingAmount?: Prisma.DecimalNullableWithAggregatesFilter<"CashSession"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingCardAmount?: Prisma.DecimalNullableWithAggregatesFilter<"CashSession"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingDigitalAmount?: Prisma.DecimalNullableWithAggregatesFilter<"CashSession"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingBitcoinAmount?: Prisma.DecimalNullableWithAggregatesFilter<"CashSession"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingChivoWalletAmount?: Prisma.DecimalNullableWithAggregatesFilter<"CashSession"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   openedAt?: Prisma.DateTimeWithAggregatesFilter<"CashSession"> | Date | string
   closedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"CashSession"> | Date | string | null
   status?: Prisma.EnumCashStatusWithAggregatesFilter<"CashSession"> | $Enums.CashStatus
@@ -325,6 +389,10 @@ export type CashSessionScalarWhereWithAggregatesInput = {
 export type CashSessionCreateInput = {
   openingAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   closingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingCardAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingDigitalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingBitcoinAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingChivoWalletAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   openedAt?: Date | string
   closedAt?: Date | string | null
   status?: $Enums.CashStatus
@@ -339,6 +407,10 @@ export type CashSessionUncheckedCreateInput = {
   employeeId: number
   openingAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   closingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingCardAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingDigitalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingBitcoinAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingChivoWalletAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   openedAt?: Date | string
   closedAt?: Date | string | null
   status?: $Enums.CashStatus
@@ -348,6 +420,10 @@ export type CashSessionUncheckedCreateInput = {
 export type CashSessionUpdateInput = {
   openingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   closingAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingCardAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingDigitalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingBitcoinAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingChivoWalletAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   openedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumCashStatusFieldUpdateOperationsInput | $Enums.CashStatus
@@ -362,6 +438,10 @@ export type CashSessionUncheckedUpdateInput = {
   employeeId?: Prisma.IntFieldUpdateOperationsInput | number
   openingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   closingAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingCardAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingDigitalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingBitcoinAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingChivoWalletAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   openedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumCashStatusFieldUpdateOperationsInput | $Enums.CashStatus
@@ -374,6 +454,10 @@ export type CashSessionCreateManyInput = {
   employeeId: number
   openingAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   closingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingCardAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingDigitalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingBitcoinAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingChivoWalletAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   openedAt?: Date | string
   closedAt?: Date | string | null
   status?: $Enums.CashStatus
@@ -382,6 +466,10 @@ export type CashSessionCreateManyInput = {
 export type CashSessionUpdateManyMutationInput = {
   openingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   closingAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingCardAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingDigitalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingBitcoinAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingChivoWalletAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   openedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumCashStatusFieldUpdateOperationsInput | $Enums.CashStatus
@@ -393,6 +481,10 @@ export type CashSessionUncheckedUpdateManyInput = {
   employeeId?: Prisma.IntFieldUpdateOperationsInput | number
   openingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   closingAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingCardAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingDigitalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingBitcoinAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingChivoWalletAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   openedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumCashStatusFieldUpdateOperationsInput | $Enums.CashStatus
@@ -419,6 +511,10 @@ export type CashSessionCountOrderByAggregateInput = {
   employeeId?: Prisma.SortOrder
   openingAmount?: Prisma.SortOrder
   closingAmount?: Prisma.SortOrder
+  closingCardAmount?: Prisma.SortOrder
+  closingDigitalAmount?: Prisma.SortOrder
+  closingBitcoinAmount?: Prisma.SortOrder
+  closingChivoWalletAmount?: Prisma.SortOrder
   openedAt?: Prisma.SortOrder
   closedAt?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -430,6 +526,10 @@ export type CashSessionAvgOrderByAggregateInput = {
   employeeId?: Prisma.SortOrder
   openingAmount?: Prisma.SortOrder
   closingAmount?: Prisma.SortOrder
+  closingCardAmount?: Prisma.SortOrder
+  closingDigitalAmount?: Prisma.SortOrder
+  closingBitcoinAmount?: Prisma.SortOrder
+  closingChivoWalletAmount?: Prisma.SortOrder
 }
 
 export type CashSessionMaxOrderByAggregateInput = {
@@ -438,6 +538,10 @@ export type CashSessionMaxOrderByAggregateInput = {
   employeeId?: Prisma.SortOrder
   openingAmount?: Prisma.SortOrder
   closingAmount?: Prisma.SortOrder
+  closingCardAmount?: Prisma.SortOrder
+  closingDigitalAmount?: Prisma.SortOrder
+  closingBitcoinAmount?: Prisma.SortOrder
+  closingChivoWalletAmount?: Prisma.SortOrder
   openedAt?: Prisma.SortOrder
   closedAt?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -449,6 +553,10 @@ export type CashSessionMinOrderByAggregateInput = {
   employeeId?: Prisma.SortOrder
   openingAmount?: Prisma.SortOrder
   closingAmount?: Prisma.SortOrder
+  closingCardAmount?: Prisma.SortOrder
+  closingDigitalAmount?: Prisma.SortOrder
+  closingBitcoinAmount?: Prisma.SortOrder
+  closingChivoWalletAmount?: Prisma.SortOrder
   openedAt?: Prisma.SortOrder
   closedAt?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -460,6 +568,10 @@ export type CashSessionSumOrderByAggregateInput = {
   employeeId?: Prisma.SortOrder
   openingAmount?: Prisma.SortOrder
   closingAmount?: Prisma.SortOrder
+  closingCardAmount?: Prisma.SortOrder
+  closingDigitalAmount?: Prisma.SortOrder
+  closingBitcoinAmount?: Prisma.SortOrder
+  closingChivoWalletAmount?: Prisma.SortOrder
 }
 
 export type CashSessionCreateNestedManyWithoutBranchInput = {
@@ -581,6 +693,10 @@ export type EnumCashStatusFieldUpdateOperationsInput = {
 export type CashSessionCreateWithoutBranchInput = {
   openingAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   closingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingCardAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingDigitalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingBitcoinAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingChivoWalletAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   openedAt?: Date | string
   closedAt?: Date | string | null
   status?: $Enums.CashStatus
@@ -593,6 +709,10 @@ export type CashSessionUncheckedCreateWithoutBranchInput = {
   employeeId: number
   openingAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   closingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingCardAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingDigitalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingBitcoinAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingChivoWalletAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   openedAt?: Date | string
   closedAt?: Date | string | null
   status?: $Enums.CashStatus
@@ -634,6 +754,10 @@ export type CashSessionScalarWhereInput = {
   employeeId?: Prisma.IntFilter<"CashSession"> | number
   openingAmount?: Prisma.DecimalFilter<"CashSession"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   closingAmount?: Prisma.DecimalNullableFilter<"CashSession"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingCardAmount?: Prisma.DecimalNullableFilter<"CashSession"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingDigitalAmount?: Prisma.DecimalNullableFilter<"CashSession"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingBitcoinAmount?: Prisma.DecimalNullableFilter<"CashSession"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingChivoWalletAmount?: Prisma.DecimalNullableFilter<"CashSession"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   openedAt?: Prisma.DateTimeFilter<"CashSession"> | Date | string
   closedAt?: Prisma.DateTimeNullableFilter<"CashSession"> | Date | string | null
   status?: Prisma.EnumCashStatusFilter<"CashSession"> | $Enums.CashStatus
@@ -642,6 +766,10 @@ export type CashSessionScalarWhereInput = {
 export type CashSessionCreateWithoutEmployeeInput = {
   openingAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   closingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingCardAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingDigitalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingBitcoinAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingChivoWalletAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   openedAt?: Date | string
   closedAt?: Date | string | null
   status?: $Enums.CashStatus
@@ -654,6 +782,10 @@ export type CashSessionUncheckedCreateWithoutEmployeeInput = {
   branchId: number
   openingAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   closingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingCardAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingDigitalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingBitcoinAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingChivoWalletAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   openedAt?: Date | string
   closedAt?: Date | string | null
   status?: $Enums.CashStatus
@@ -689,6 +821,10 @@ export type CashSessionUpdateManyWithWhereWithoutEmployeeInput = {
 export type CashSessionCreateWithoutSalesInput = {
   openingAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   closingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingCardAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingDigitalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingBitcoinAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingChivoWalletAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   openedAt?: Date | string
   closedAt?: Date | string | null
   status?: $Enums.CashStatus
@@ -702,6 +838,10 @@ export type CashSessionUncheckedCreateWithoutSalesInput = {
   employeeId: number
   openingAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   closingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingCardAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingDigitalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingBitcoinAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingChivoWalletAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   openedAt?: Date | string
   closedAt?: Date | string | null
   status?: $Enums.CashStatus
@@ -726,6 +866,10 @@ export type CashSessionUpdateToOneWithWhereWithoutSalesInput = {
 export type CashSessionUpdateWithoutSalesInput = {
   openingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   closingAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingCardAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingDigitalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingBitcoinAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingChivoWalletAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   openedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumCashStatusFieldUpdateOperationsInput | $Enums.CashStatus
@@ -739,6 +883,10 @@ export type CashSessionUncheckedUpdateWithoutSalesInput = {
   employeeId?: Prisma.IntFieldUpdateOperationsInput | number
   openingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   closingAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingCardAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingDigitalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingBitcoinAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingChivoWalletAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   openedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumCashStatusFieldUpdateOperationsInput | $Enums.CashStatus
@@ -749,6 +897,10 @@ export type CashSessionCreateManyBranchInput = {
   employeeId: number
   openingAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   closingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingCardAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingDigitalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingBitcoinAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingChivoWalletAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   openedAt?: Date | string
   closedAt?: Date | string | null
   status?: $Enums.CashStatus
@@ -757,6 +909,10 @@ export type CashSessionCreateManyBranchInput = {
 export type CashSessionUpdateWithoutBranchInput = {
   openingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   closingAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingCardAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingDigitalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingBitcoinAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingChivoWalletAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   openedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumCashStatusFieldUpdateOperationsInput | $Enums.CashStatus
@@ -769,6 +925,10 @@ export type CashSessionUncheckedUpdateWithoutBranchInput = {
   employeeId?: Prisma.IntFieldUpdateOperationsInput | number
   openingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   closingAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingCardAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingDigitalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingBitcoinAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingChivoWalletAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   openedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumCashStatusFieldUpdateOperationsInput | $Enums.CashStatus
@@ -780,6 +940,10 @@ export type CashSessionUncheckedUpdateManyWithoutBranchInput = {
   employeeId?: Prisma.IntFieldUpdateOperationsInput | number
   openingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   closingAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingCardAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingDigitalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingBitcoinAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingChivoWalletAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   openedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumCashStatusFieldUpdateOperationsInput | $Enums.CashStatus
@@ -790,6 +954,10 @@ export type CashSessionCreateManyEmployeeInput = {
   branchId: number
   openingAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   closingAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingCardAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingDigitalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingBitcoinAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingChivoWalletAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   openedAt?: Date | string
   closedAt?: Date | string | null
   status?: $Enums.CashStatus
@@ -798,6 +966,10 @@ export type CashSessionCreateManyEmployeeInput = {
 export type CashSessionUpdateWithoutEmployeeInput = {
   openingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   closingAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingCardAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingDigitalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingBitcoinAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingChivoWalletAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   openedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumCashStatusFieldUpdateOperationsInput | $Enums.CashStatus
@@ -810,6 +982,10 @@ export type CashSessionUncheckedUpdateWithoutEmployeeInput = {
   branchId?: Prisma.IntFieldUpdateOperationsInput | number
   openingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   closingAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingCardAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingDigitalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingBitcoinAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingChivoWalletAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   openedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumCashStatusFieldUpdateOperationsInput | $Enums.CashStatus
@@ -821,6 +997,10 @@ export type CashSessionUncheckedUpdateManyWithoutEmployeeInput = {
   branchId?: Prisma.IntFieldUpdateOperationsInput | number
   openingAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   closingAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingCardAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingDigitalAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingBitcoinAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  closingChivoWalletAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   openedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumCashStatusFieldUpdateOperationsInput | $Enums.CashStatus
@@ -863,6 +1043,10 @@ export type CashSessionSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   employeeId?: boolean
   openingAmount?: boolean
   closingAmount?: boolean
+  closingCardAmount?: boolean
+  closingDigitalAmount?: boolean
+  closingBitcoinAmount?: boolean
+  closingChivoWalletAmount?: boolean
   openedAt?: boolean
   closedAt?: boolean
   status?: boolean
@@ -878,6 +1062,10 @@ export type CashSessionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   employeeId?: boolean
   openingAmount?: boolean
   closingAmount?: boolean
+  closingCardAmount?: boolean
+  closingDigitalAmount?: boolean
+  closingBitcoinAmount?: boolean
+  closingChivoWalletAmount?: boolean
   openedAt?: boolean
   closedAt?: boolean
   status?: boolean
@@ -891,6 +1079,10 @@ export type CashSessionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   employeeId?: boolean
   openingAmount?: boolean
   closingAmount?: boolean
+  closingCardAmount?: boolean
+  closingDigitalAmount?: boolean
+  closingBitcoinAmount?: boolean
+  closingChivoWalletAmount?: boolean
   openedAt?: boolean
   closedAt?: boolean
   status?: boolean
@@ -904,12 +1096,16 @@ export type CashSessionSelectScalar = {
   employeeId?: boolean
   openingAmount?: boolean
   closingAmount?: boolean
+  closingCardAmount?: boolean
+  closingDigitalAmount?: boolean
+  closingBitcoinAmount?: boolean
+  closingChivoWalletAmount?: boolean
   openedAt?: boolean
   closedAt?: boolean
   status?: boolean
 }
 
-export type CashSessionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "branchId" | "employeeId" | "openingAmount" | "closingAmount" | "openedAt" | "closedAt" | "status", ExtArgs["result"]["cashSession"]>
+export type CashSessionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "branchId" | "employeeId" | "openingAmount" | "closingAmount" | "closingCardAmount" | "closingDigitalAmount" | "closingBitcoinAmount" | "closingChivoWalletAmount" | "openedAt" | "closedAt" | "status", ExtArgs["result"]["cashSession"]>
 export type CashSessionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
   employee?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
@@ -938,6 +1134,10 @@ export type $CashSessionPayload<ExtArgs extends runtime.Types.Extensions.Interna
     employeeId: number
     openingAmount: runtime.Decimal
     closingAmount: runtime.Decimal | null
+    closingCardAmount: runtime.Decimal | null
+    closingDigitalAmount: runtime.Decimal | null
+    closingBitcoinAmount: runtime.Decimal | null
+    closingChivoWalletAmount: runtime.Decimal | null
     openedAt: Date
     closedAt: Date | null
     status: $Enums.CashStatus
@@ -1372,6 +1572,10 @@ export interface CashSessionFieldRefs {
   readonly employeeId: Prisma.FieldRef<"CashSession", 'Int'>
   readonly openingAmount: Prisma.FieldRef<"CashSession", 'Decimal'>
   readonly closingAmount: Prisma.FieldRef<"CashSession", 'Decimal'>
+  readonly closingCardAmount: Prisma.FieldRef<"CashSession", 'Decimal'>
+  readonly closingDigitalAmount: Prisma.FieldRef<"CashSession", 'Decimal'>
+  readonly closingBitcoinAmount: Prisma.FieldRef<"CashSession", 'Decimal'>
+  readonly closingChivoWalletAmount: Prisma.FieldRef<"CashSession", 'Decimal'>
   readonly openedAt: Prisma.FieldRef<"CashSession", 'DateTime'>
   readonly closedAt: Prisma.FieldRef<"CashSession", 'DateTime'>
   readonly status: Prisma.FieldRef<"CashSession", 'CashStatus'>
