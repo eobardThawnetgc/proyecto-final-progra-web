@@ -28,7 +28,7 @@ const LoginPage = () => {
 
             toast.success(response.message);
 
-            navigate("/dashboard", {
+            navigate(response.employee?.role === 'CASHIER' ? '/caja' : '/productos', {
                 replace: true
             });
 

@@ -12,7 +12,7 @@ export default function ProtectedRoute() {
       </div>
     )
   }
-  if (!employee) return <Navigate to="/login" replace />
+  if (!employee) return <Navigate to="/auth/login" replace />
 
   return <Outlet />
 }

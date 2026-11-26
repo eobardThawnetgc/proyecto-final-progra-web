@@ -1,4 +1,42 @@
 
+const currencyFormatter = new Intl.NumberFormat('es-SV', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+});
+
+const dateFormatter = new Intl.DateTimeFormat('es-SV', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    timeZone: 'UTC',
+});
+
+export const paymentStatuses = {
+    PENDING: { label: 'Pendiente', color: 'warning' },
+    PARTIAL: { label: 'Parcial', color: 'info' },
+    PAID: { label: 'Pagada', color: 'success' },
+};
+
+export const money = (value) => currencyFormatter.format(Number(value) || 0);
+
+export const unitCostMoney = (value) => new Intl.NumberFormat('es-SV', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 6,
+}).format(Number(value) || 0);
+
+const formatDate = (value) => {
+    if (!value) return '—';
+    const date = value instanceof Date ? value : new Date(value);
+    return Number.isNaN(date.getTime()) ? '—' : dateFormatter.format(date);
+};
+
+export const invoiceDate = formatDate;
+export const paymentDate = formatDate;
+
 export const lineCents = ({ quantity, unitCost }) => {
     const quantityText = String(quantity);
     const costText = String(unitCost);

@@ -7,6 +7,9 @@ import { lineCents, money } from './purchaseFormatting.js';
 
 const newLine = (key) => ({ key, type: 'stock', inventoryItemId: '', description: '', quantity: '1', unitCost: '' });
 const today = () => new Intl.DateTimeFormat('sv-SE', { timeZone: 'America/El_Salvador' }).format(new Date());
+const exactMoney = (value) => new Intl.NumberFormat('es-SV', {
+    style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 6,
+}).format(value);
 
 export default function PurchaseForm({ branches, homeBranchId, suppliers, close, save, saving, error }) {
     const [branchId, setBranchId] = useState(homeBranchId);
@@ -14,6 +17,8 @@ export default function PurchaseForm({ branches, homeBranchId, suppliers, close,
     const [inventory, setInventory] = useState(null);
     const items = inventory?.branchId === branchId ? inventory.items : [];
     const total = lines.reduce((sum, line) => sum + lineCents(line), 0n);
+    const hasEnteredCost = lines.some((line) => line.unitCost !== '');
+    const totalBelowCent = total === 0n && hasEnteredCost;
     const inventoryPending = inventory?.branchId !== branchId;
     const inventoryError = !inventoryPending && inventory.error;
     const hasStockLines = lines.some((line) => line.type === 'stock');
@@ -126,7 +131,14 @@ export default function PurchaseForm({ branches, homeBranchId, suppliers, close,
                                             value={line.unitCost} required onChange={(event) => updateLine(line.key, { unitCost: event.target.value })} />
                                     </FormGroup></Col>
                                     <Col md="4" className="d-flex justify-content-between align-items-center gap-2 pb-2">
-                                        <span className="fw-semibold" aria-label="Subtotal">{money(Number(lineCents(line)) / 100)}</span>
+                                        <span className="fw-semibold" aria-label="Subtotal">
+                                            {money(Number(lineCents(line)) / 100)}
+                                            {lineCents(line) === 0n && Number(line.quantity) > 0 && Number(line.unitCost) > 0 && (
+                                                <small className="d-block text-body-secondary fw-normal">
+                                                    {exactMoney(Number(line.quantity) * Number(line.unitCost))} antes del redondeo
+                                                </small>
+                                            )}
+                                        </span>
                                         <Button size="sm" color="outline-danger" type="button" disabled={lines.length === 1}
                                             aria-label={`Quitar renglón ${index + 1}`}
                                             onClick={() => setLines(lines.filter(({ key }) => key !== line.key))}>
@@ -147,6 +159,9 @@ export default function PurchaseForm({ branches, homeBranchId, suppliers, close,
                             <Col sm="6" className="text-sm-end mt-3 mt-sm-0">
                                 <span>Total de la factura</span>
                                 <strong className="d-block fs-4" aria-live="polite">{money(Number(total) / 100)}</strong>
+                                {totalBelowCent && <small className="d-block text-danger" role="alert">
+                                    El importe es menor a $0.01 y se redondea a $0.00. Revisa el costo unitario y la unidad del insumo.
+                                </small>}
                             </Col>
                         </Row>
                     </fieldset>
@@ -154,7 +169,7 @@ export default function PurchaseForm({ branches, homeBranchId, suppliers, close,
                 <ModalFooter>
                     <Button color="secondary" type="button" onClick={close} disabled={saving}>Cancelar</Button>
                     <Button className="purchase-primary" type="submit"
-                        disabled={saving || (hasStockLines && (inventoryPending || Boolean(inventoryError)))}>
+                        disabled={saving || total === 0n || (hasStockLines && (inventoryPending || Boolean(inventoryError)))}>
                         {saving ? 'Registrando…' : 'Registrar compra'}
                     </Button>
                 </ModalFooter>

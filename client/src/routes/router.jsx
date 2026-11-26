@@ -16,15 +16,7 @@ import { fetchPosProducts } from "../services/salesService.js";
 export const AppRouter = createBrowserRouter([
     {
         path: "/dashboard",
-        loader: async () => {
-            try {
-                const { employee } = await getCurrentUser();
-                return redirect(employee.role === 'CASHIER' ? '/caja' : '/productos');
-            } catch (error) {
-                if (error.status === 401) return redirect('/auth/login');
-                throw error;
-            }
-        },
+        loader: () => redirect('/auth/login'),
     },
     {
         path: "/ventas",
@@ -182,11 +174,15 @@ export const AppRouter = createBrowserRouter([
     },
     {
         path: "*",
-        element: <ErrorPage />
+        loader: () => redirect('/auth/login'),
     },
     {
         path: "/",
-        loader: () => redirect("/dashboard"),
+        loader: () => redirect("/auth/login"),
+    },
+    {
+        path: "/login",
+        loader: () => redirect("/auth/login"),
     },
     {
         path: "/auth",
