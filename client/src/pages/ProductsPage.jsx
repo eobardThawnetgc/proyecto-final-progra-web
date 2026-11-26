@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useLoaderData, useNavigate } from 'react-router-dom';
+import { useLoaderData, useNavigate, useRevalidator } from 'react-router-dom';
 import { Alert, Badge, Button, Card, CardBody, Container, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Spinner } from 'reactstrap';
 import { toast } from 'sonner';
 import { logout } from '../services/authService.js';
@@ -14,6 +14,7 @@ const emptyForm = () => ({ name: '', description: '', type: 'PREPARED', price: '
 export default function ProductsPage() {
     const { employee, products: initialProducts, ingredients, packagedInventory } = useLoaderData();
     const navigate = useNavigate();
+    const { revalidate } = useRevalidator();
     const canManage = ['ADMIN', 'MANAGER'].includes(employee.role);
     const canConsume = ['ADMIN', 'MANAGER', 'CASHIER'].includes(employee.role);
     const [products, setProducts] = useState(initialProducts);
@@ -44,6 +45,10 @@ export default function ProductsPage() {
             || (product.inventoryItem && product.inventoryItem.quantity <= product.inventoryItem.minimumStock)).length,
     }), [products]);
 
+    const formBranchId = modal?.product?.branchId ?? employee.branchId;
+    const branchIngredients = ingredients.filter((item) => item.branchId === formBranchId);
+    const branchPackaged = packagedInventory.filter((item) => item.branchId === formBranchId);
+
     const openCreate = () => { setForm(emptyForm()); setError(''); setModal({ kind: 'edit' }); };
     const openEdit = (product) => {
         setForm({
@@ -65,7 +70,7 @@ export default function ProductsPage() {
             if (modal.product) await productsService.update(modal.product.id, payload);
             else await productsService.create(payload);
             toast.success(modal.product ? 'Producto actualizado' : 'Producto creado');
-            setModal(null); await loadProducts();
+            setModal(null); await Promise.all([loadProducts(), revalidate()]);
         } catch (e) { setError(e.message); }
         finally { setSaving(false); }
     };
@@ -81,7 +86,7 @@ export default function ProductsPage() {
         try {
             const result = await productsService.consume(modal.product.id, Number(consumeAmount));
             toast.success(`Consumo registrado: ${result.consumed.map((line) => `${line.name} −${line.quantity} ${line.unit}`).join(', ')}`);
-            setModal(null); await loadProducts();
+            setModal(null); await Promise.all([loadProducts(), revalidate()]);
         } catch (e) { setError(e.message); }
         finally { setBusy(false); }
     };
@@ -102,7 +107,7 @@ export default function ProductsPage() {
                 const low = product.type === 'PREPARED' ? product.recipe.some((line) => line.stock <= line.minimumStock) : product.inventoryItem?.quantity <= product.inventoryItem?.minimumStock;
                 return <Card key={product.id} className="product-card"><CardBody>
                     <div className="product-card-top"><span className={`product-icon ${product.type === 'PACKAGED' ? 'packaged' : ''}`}><i className={`bi ${product.type === 'PACKAGED' ? 'bi-box-seam' : 'bi-cup-hot'}`}/></span><Badge pill className={product.type === 'PREPARED' ? 'badge-prepared' : 'badge-packaged'}>{product.type === 'PREPARED' ? 'Elaborado' : 'Empacado'}</Badge>{low && <span className="stock-warning" title="Hay ingredientes en nivel mínimo"><i className="bi bi-exclamation-circle-fill"/></span>}</div>
-                    <h2>{product.name}</h2><p className="product-description">{product.description || 'Sin descripción'}</p><div className="product-price">{money(product.price)} <span>por unidad</span></div>
+                    <h2>{product.name}</h2>{employee.role === 'ADMIN' && <small>{product.branch.name}</small>}<p className="product-description">{product.description || 'Sin descripción'}</p><div className="product-price">{money(product.price)} <span>por unidad</span></div>
                     <div className="recipe-preview">{product.type === 'PREPARED' ? <><strong>Receta</strong><span>{product.recipe.map((line) => `${line.quantity} ${line.unit} ${line.name}`).join(' · ')}</span></> : <><strong>Existencia</strong><span>{product.inventoryItem?.quantity ?? 0} {product.inventoryItem?.unit ?? 'unidades'} disponibles</span></>}</div>
                     <div className="product-actions">{canConsume && <Button outline className="consume-button" onClick={() => { setError(''); setConsumeAmount('1'); setModal({ kind: 'consume', product }); }}><i className="bi bi-dash-circle me-2"/>Registrar consumo</Button>}{canManage && <><Button className="icon-action" aria-label={`Editar ${product.name}`} onClick={() => openEdit(product)}><i className="bi bi-pencil"/></Button><Button className="icon-action danger" aria-label={`Retirar ${product.name}`} onClick={() => deactivate(product)}><i className="bi bi-archive"/></Button></>}</div>
                 </CardBody></Card>;
@@ -112,7 +117,7 @@ export default function ProductsPage() {
             {modal?.kind === 'edit' ? <form onSubmit={save}><ModalHeader toggle={() => setModal(null)}>{modal.product ? 'Editar producto' : 'Nuevo producto'}</ModalHeader><ModalBody>
                 {error && <Alert color="danger">{error}</Alert>}
                 <div className="editor-grid"><div><Label for="product-name">Nombre del producto</Label><Input id="product-name" value={form.name} onChange={(e) => changeForm('name', e.target.value)} minLength="2" maxLength="100" required/></div><div><Label for="product-price">Precio de venta · USD</Label><Input id="product-price" type="number" min="0.01" step="0.01" value={form.price} onChange={(e) => changeForm('price', e.target.value)} required/></div><div className="editor-full"><Label for="product-description">Descripción</Label><Input id="product-description" value={form.description} onChange={(e) => changeForm('description', e.target.value)} maxLength="500"/></div><div className="editor-full"><Label for="product-type">Tipo de producto</Label><Input id="product-type" type="select" value={form.type} onChange={(e) => changeForm('type', e.target.value)}><option value="PREPARED">Elaborado con receta</option><option value="PACKAGED">Empacado para reventa</option></Input></div></div>
-                {form.type === 'PREPARED' ? <section className="recipe-editor"><div className="recipe-editor-heading"><div><h3>Ingredientes por unidad</h3><p>Al registrar consumo, estas cantidades se descuentan del inventario.</p></div><Button type="button" className="add-ingredient" onClick={() => changeForm('recipe', [...form.recipe, { inventoryItemId: '', quantity: '' }])}><i className="bi bi-plus-lg me-1"/>Agregar</Button></div>{form.recipe.map((line, index) => <div className="ingredient-row" key={index}><Input aria-label="Ingrediente" type="select" value={line.inventoryItemId} onChange={(e) => changeForm('recipe', form.recipe.map((row, i) => i === index ? { ...row, inventoryItemId: e.target.value } : row))}><option value="">Selecciona un insumo</option>{ingredients.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.unit} · stock {item.quantity}</option>)}</Input><Input aria-label="Cantidad del ingrediente" type="text" inputMode="numeric" pattern="[0-9]*" maxLength="9" placeholder="Cantidad entera" value={line.quantity} onChange={(e) => { if (integerInput(e.target.value)) changeForm('recipe', form.recipe.map((row, i) => i === index ? { ...row, quantity: e.target.value } : row)); }}/><Button type="button" className="remove-ingredient" aria-label="Quitar ingrediente" disabled={form.recipe.length === 1} onClick={() => changeForm('recipe', form.recipe.filter((_, i) => i !== index))}><i className="bi bi-x-lg"/></Button></div>)}</section> : <section className="recipe-editor"><Label for="packaged-inventory">Existencia de inventario vinculada</Label><Input id="packaged-inventory" type="select" value={form.inventoryItemId} onChange={(e) => changeForm('inventoryItemId', e.target.value)} required><option value="">Selecciona el producto empacado</option>{packagedInventory.map((item) => <option key={item.id} value={item.id}>{item.name} · stock {item.quantity} {item.unit}</option>)}{modal.product?.inventoryItem && !packagedInventory.some((item) => String(item.id) === form.inventoryItemId) && <option value={form.inventoryItemId}>{modal.product.inventoryItem.name} · stock {modal.product.inventoryItem.quantity}</option>}</Input><p>El producto y su existencia se descuentan juntos al registrar consumo.</p></section>}
+                {form.type === 'PREPARED' ? <section className="recipe-editor"><div className="recipe-editor-heading"><div><h3>Ingredientes por unidad</h3><p>Al registrar consumo, estas cantidades se descuentan del inventario.</p></div><Button type="button" className="add-ingredient" onClick={() => changeForm('recipe', [...form.recipe, { inventoryItemId: '', quantity: '' }])}><i className="bi bi-plus-lg me-1"/>Agregar</Button></div>{form.recipe.map((line, index) => <div className="ingredient-row" key={index}><Input aria-label="Ingrediente" required type="select" value={line.inventoryItemId} onChange={(e) => changeForm('recipe', form.recipe.map((row, i) => i === index ? { ...row, inventoryItemId: e.target.value } : row))}><option value="">Selecciona un insumo</option>{branchIngredients.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.unit} · stock {item.quantity}</option>)}</Input><Input aria-label="Cantidad del ingrediente" required type="text" inputMode="numeric" pattern="[0-9]*" maxLength="9" placeholder="Cantidad entera" value={line.quantity} onChange={(e) => { if (integerInput(e.target.value)) changeForm('recipe', form.recipe.map((row, i) => i === index ? { ...row, quantity: e.target.value } : row)); }}/><Button type="button" className="remove-ingredient" aria-label="Quitar ingrediente" disabled={form.recipe.length === 1} onClick={() => changeForm('recipe', form.recipe.filter((_, i) => i !== index))}><i className="bi bi-x-lg"/></Button></div>)}</section> : <section className="recipe-editor"><Label for="packaged-inventory">Existencia de inventario vinculada</Label><Input id="packaged-inventory" type="select" value={form.inventoryItemId} onChange={(e) => changeForm('inventoryItemId', e.target.value)} required><option value="">Selecciona el producto empacado</option>{branchPackaged.map((item) => <option key={item.id} value={item.id}>{item.name} · stock {item.quantity} {item.unit}</option>)}{modal.product?.inventoryItem && !branchPackaged.some((item) => item.id === modal.product.inventoryItem.id) && <option value={modal.product.inventoryItem.id}>{modal.product.inventoryItem.name} · stock {modal.product.inventoryItem.quantity}</option>}</Input><p>El producto y su existencia se descuentan juntos al registrar consumo.</p></section>}
             </ModalBody><ModalFooter><Button className="cancel-button" onClick={() => setModal(null)} type="button">Cancelar</Button><Button className="products-create" disabled={saving}>{saving ? 'Guardando…' : modal.product ? 'Guardar cambios' : 'Crear producto'}</Button></ModalFooter></form> : modal?.kind === 'consume' ? <form onSubmit={consume}><ModalHeader toggle={() => setModal(null)}>Registrar consumo</ModalHeader><ModalBody>{error && <Alert color="danger">{error}</Alert>}<p className="consume-intro">Se actualizarán las existencias según la receta de <strong>{modal.product.name}</strong>.</p><Label for="consume-quantity">Unidades vendidas / consumidas</Label><Input id="consume-quantity" type="text" inputMode="numeric" pattern="[0-9]*" maxLength="9" value={consumeAmount} onChange={(e) => { if (integerInput(e.target.value)) setConsumeAmount(e.target.value); }} required/><div className="consume-preview">{modal.product.recipe.map((line) => <span key={line.inventoryItemId}>{line.name}<strong>{(line.quantity * Number(consumeAmount || 0)).toLocaleString('es-SV')} {line.unit}</strong></span>)}</div></ModalBody><ModalFooter><Button className="cancel-button" type="button" onClick={() => setModal(null)}>Cancelar</Button><Button className="products-create" disabled={busy}>{busy ? <><Spinner size="sm" className="me-2"/>Registrando…</> : 'Confirmar consumo'}</Button></ModalFooter></form> : null}
         </Modal>
     </main>;

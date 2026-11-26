@@ -1,6 +1,7 @@
 import express from "express";
 import { register, login, logout } from "../controllers/auth/authControllers.js";
 import { authenticate } from "../middleware/authMiddleware.js";
+import { authorize } from "../middleware/roleMiddleware.js";
 
 const authRouter = express.Router();
 
@@ -13,7 +14,7 @@ authRouter.get("/me", authenticate, (req, res) => {
     });
 });
 
-authRouter.post("/register", register);
+authRouter.post("/register", authenticate, authorize("ADMIN", "MANAGER"), register);
 authRouter.post("/login", login);
 authRouter.post("/logout", logout);
 

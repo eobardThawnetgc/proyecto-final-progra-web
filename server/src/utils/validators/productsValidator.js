@@ -16,7 +16,8 @@ const productFields = {
     name: z.string().trim().min(2).max(100),
     description: z.string().trim().max(500).nullable().optional(),
     type: z.enum(['PREPARED', 'PACKAGED']),
-    price: z.number().positive('El precio debe ser mayor que cero').max(100000),
+    price: z.number().positive('El precio debe ser mayor que cero').max(100000)
+        .refine((value) => Number(value.toFixed(2)) === value, 'El precio admite hasta dos decimales'),
     active: z.boolean().optional(),
     recipe: z.array(recipeLine).max(50).optional().refine(
         (recipe) => !recipe || new Set(recipe.map((line) => line.inventoryItemId)).size === recipe.length,
@@ -33,7 +34,7 @@ export const createProductSchema = z.object({ ...productFields, branchId: z.numb
         message: 'Vincula el producto con su existencia de inventario', path: ['inventoryItemId'],
     });
 
-export const updateProductSchema = z.object(productFields).strict().refine(
+export const updateProductSchema = z.object(productFields).partial().strict().refine(
     (data) => Object.keys(data).length > 0,
     { message: 'Envía al menos un campo para actualizar' },
 ).refine((data) => data.type !== 'PREPARED' || !('inventoryItemId' in data), {

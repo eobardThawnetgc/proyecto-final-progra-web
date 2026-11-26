@@ -11,7 +11,7 @@ salesRouter.get('/', getSales);
 
 // Compatibilidad del POS legado: todas las ventas se convierten en facturas consumidor final.
 salesRouter.post('/', (req, _res, next) => {
-    const sourceDetails = req.body.details ?? req.body.items;
+    const sourceDetails = req.body?.details ?? req.body?.items;
     if (Array.isArray(sourceDetails)) {
         req.body = {
             documentType: req.body.documentType ?? 'CONSUMER',
@@ -19,7 +19,7 @@ salesRouter.post('/', (req, _res, next) => {
             customerNit: req.body.customerNit ?? null,
             customerNrc: req.body.customerNrc ?? null,
             paymentMethod: req.body.paymentMethod,
-            details: sourceDetails.map(({ productId, quantity }) => ({ productId: Number(productId), quantity: String(quantity) })),
+            details: sourceDetails.map((line) => ({ productId: Number(line?.productId), quantity: String(line?.quantity) })),
         };
     }
     next();

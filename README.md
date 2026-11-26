@@ -9,12 +9,12 @@ Sistema web local de ERP y POS para administrar facturación, productos, recetas
 - Docker Desktop
 - Visual Studio Code es opcional
 
-Los paquetes del proyecto también admiten Node.js `20.19+`, `22.12+` y `24+`.
+El servidor importa el cliente TypeScript de Prisma directamente en Node.js. La demo también se verificó con Node.js `24.20.0`.
 
 ## Clonar el proyecto
 
 ```powershell
-git clone https://github.com/eobardThawnetgc/proyecto-final-progra-web.git
+git clone --branch develop https://github.com/eobardThawnetgc/proyecto-final-progra-web.git
 cd proyecto-final-progra-web
 ```
 
@@ -45,7 +45,7 @@ Crea el contenedor PostgreSQL 17:
 docker run -d --name origenes_db `
   -e POSTGRES_USER=postgres `
   -e POSTGRES_PASSWORD=admin123 `
-  -p 5437:5432 `
+  -p 127.0.0.1:5437:5432 `
   -v origenes_data:/var/lib/postgresql/data `
   postgres:17
 ```
@@ -100,11 +100,11 @@ Desde `server`, ejecuta:
 ```powershell
 npx prisma validate
 npx prisma generate
-npx prisma migrate dev
+npx prisma migrate deploy
 npm run seed
 ```
 
-Las migraciones existentes preparan el esquema. No uses `prisma db push` como flujo habitual ni crees otra migración inicial. `npm run seed` prepara el administrador de demostración, dos sucursales, insumos, doce productos preparados con recetas y un producto empacado para reventa.
+Las migraciones existentes preparan el esquema. `npm run seed` prepara cuatro sucursales de demostración, empleados, compras, ventas y planillas. Cada sucursal cuenta con insumos, doce productos preparados con recetas y un producto empacado para reventa.
 
 Opcionalmente, puedes inspeccionar la base con Prisma Studio:
 
@@ -158,7 +158,7 @@ docker start origenes_db
 - **Prisma no encuentra `DATABASE_URL`:** confirma que `server/.env` y `server/prisma.config.ts` estén en la raíz de `server`, y ejecuta Prisma desde esa carpeta.
 - **El contenedor ya existe:** ejecuta `docker start origenes_db`; no repitas `docker run`.
 - **No conecta el frontend con el backend:** deja activo `npm run dev` en `server` y confirma que el puerto sea `3000`.
-- **Error de esquema:** desde `server`, ejecuta `npx prisma validate`, `npx prisma generate` y `npx prisma migrate dev`.
+- **Error de esquema:** desde `server`, ejecuta `npx prisma validate`, `npx prisma generate` y `npx prisma migrate deploy`.
 
 ## Módulos
 

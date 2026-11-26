@@ -168,7 +168,7 @@ export default function InventoryPage() {
             <ul className="inventory-alert-list list-unstyled mb-0">
               {alerts.map((item) => (
                 <li key={item.id}>
-                  <span>{item.name}</span><strong>{item.quantity} / {item.minimumStock} {item.unit}</strong>
+                  <span>{item.name} · {item.branch.name}</span><strong>{item.quantity} / {item.minimumStock} {item.unit}</strong>
                 </li>
               ))}
             </ul>

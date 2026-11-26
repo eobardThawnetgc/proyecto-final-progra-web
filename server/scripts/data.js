@@ -86,6 +86,7 @@ const seedOperationalData = async (branch) => {
         const exists = await prisma.purchase.findFirst({
             where: { branchId: branch.id, supplierId: suppliers[example.supplier].id, invoiceNumber },
         });
+        if (exists) continue;
         const lines = example.items.map(([name, quantity, unitCost]) => {
             const item = stockByName.get(name.toLocaleLowerCase());
             if (!item) throw new Error(`No se encontró el insumo demo "${name}" en ${branch.name}`);
@@ -94,29 +95,6 @@ const seedOperationalData = async (branch) => {
         });
         const total = Math.round(lines.reduce((sum, line) => sum + line.subtotal, 0) * 100) / 100;
         const status = example.paidAmount === 0 ? 'PENDING' : example.paidAmount === total ? 'PAID' : 'PARTIAL';
-        if (exists) {
-            await prisma.purchase.update({
-                where: { id: exists.id },
-                data: { total, paidAmount: example.paidAmount, status },
-            });
-            if (example.paidAmount > 0) {
-                const payment = await prisma.purchasePayment.findFirst({
-                    where: { purchaseId: exists.id, imported: false },
-                    orderBy: { id: 'asc' },
-                });
-                if (payment) {
-                    await prisma.purchasePayment.update({
-                        where: { id: payment.id },
-                        data: { amount: example.paidAmount, employeeId: employees.manager.id },
-                    });
-                } else {
-                    await prisma.purchasePayment.create({
-                        data: { purchaseId: exists.id, amount: example.paidAmount, employeeId: employees.manager.id },
-                    });
-                }
-            }
-            continue;
-        }
         await prisma.purchase.create({
             data: {
                 branchId: branch.id,
@@ -207,7 +185,7 @@ const seedOperationalData = async (branch) => {
         await prisma.branch.update({ where: { id: branch.id }, data: { [field]: documentNumber } });
     }
 
-    const payrollEmployee = await prisma.employee.findMany({ where: { branchId: branch.id, active: true } });
+    const payrollEmployee = await prisma.employee.findMany({ where: { branchId: branch.id, active: true, hireDate: { lt: new Date("2026-11-16T00:00:00Z") } } });
     for (const employee of payrollEmployee) {
         const period = prepararPlanillaQuincenal(employee, 2026, 11, 1);
         const exists = await prisma.payroll.findFirst({
@@ -246,6 +224,7 @@ const main = async () => {
             email: 'admin@origenes.sv',
             password: await bcrypt.hash('Admin1234!', 12),
             role: 'ADMIN',
+            hireDate: new Date('2025-01-15T12:00:00.000Z'),
             position: 'Administrador',
             salary: 1000,
             branchId: branch.id
@@ -274,28 +253,21 @@ const main = async () => {
             const existingProduct = await prisma.product.findFirst({
                 where: { branchId: currentBranch.id, name: menuItem.name },
             });
-            const product = existingProduct
-                ? await prisma.product.update({
-                    where: { id: existingProduct.id },
-                    data: { description: menuItem.description, type: 'PREPARED', price: menuItem.price, active: true },
-                })
-                : await prisma.product.create({
-                    data: {
-                        branchId: currentBranch.id,
-                        name: menuItem.name,
-                        description: menuItem.description,
-                        type: 'PREPARED',
-                        price: menuItem.price,
-                    },
-                });
-
-            await prisma.recipeItem.deleteMany({ where: { productId: product.id } });
-            await prisma.recipeItem.createMany({
-                data: menuItem.recipe.map(([name, quantity]) => {
-                    const ingredient = byName.get(name.toLowerCase());
-                    if (!ingredient) throw new Error(`Falta el insumo "${name}" en ${currentBranch.name}`);
-                    return { productId: product.id, inventoryItemId: ingredient.id, quantity };
-                }),
+            if (existingProduct) continue;
+            const recipe = menuItem.recipe.map(([name, quantity]) => {
+                const ingredient = byName.get(name.toLowerCase());
+                if (!ingredient) throw new Error(`Falta el insumo "${name}" en ${currentBranch.name}`);
+                return { inventoryItemId: ingredient.id, quantity };
+            });
+            await prisma.product.create({
+                data: {
+                    branchId: currentBranch.id,
+                    name: menuItem.name,
+                    description: menuItem.description,
+                    type: 'PREPARED',
+                    price: menuItem.price,
+                    recipeItems: { create: recipe },
+                },
             });
         }
 
@@ -308,7 +280,7 @@ const main = async () => {
             where: { branchId: currentBranch.id, name: 'Agua embotellada 600 ml' },
         });
 
-        if (!packagedProduct) {
+        if (!packagedProduct && packagedInventory.productId === null) {
             await prisma.product.create({
                 data: {
                     branchId: currentBranch.id,
@@ -319,35 +291,6 @@ const main = async () => {
                     inventoryItem: { connect: { id: packagedInventory.id } },
                 },
             });
-        } else {
-            const linkedInventory = await prisma.inventoryItem.findFirst({
-                where: { productId: packagedProduct.id },
-                select: { id: true },
-            });
-
-            if (linkedInventory && linkedInventory.id !== packagedInventory.id) {
-                await prisma.inventoryItem.update({
-                    where: { id: linkedInventory.id },
-                    data: { productId: null },
-                });
-            }
-
-            await prisma.product.update({
-                where: { id: packagedProduct.id },
-                data: {
-                    description: 'Agua embotellada para reventa.',
-                    type: 'PACKAGED',
-                    price: 1.25,
-                    active: true,
-                },
-            });
-
-            if (packagedInventory.productId !== packagedProduct.id) {
-                await prisma.inventoryItem.update({
-                    where: { id: packagedInventory.id },
-                    data: { productId: packagedProduct.id },
-                });
-            }
         }
     }
 

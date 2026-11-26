@@ -29,7 +29,7 @@ export default function InventoryTable({ items, canManage, onEdit, onAdjust, onD
         {items.map((item) => (
           //filas de datos y alerta visual
           <tr key={item.id} className={item.status === 'OK' ? '' : 'inventory-row-alert'}>
-            <td className="fw-semibold">{item.name}</td>
+            <td className="fw-semibold">{item.name}<small className="d-block fw-normal">{item.branch.name}</small></td>
             <td>{typeLabel(item.type)}</td>
             <td className="text-end">{item.quantity} {item.unit}</td>
             <td className="text-end">{item.minimumStock} {item.unit}</td>

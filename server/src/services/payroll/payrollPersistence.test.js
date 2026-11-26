@@ -11,6 +11,7 @@ const empleado = {
   id: 1,
   branchId: 1,
   salary: 800,
+  hireDate: new Date("2025-01-15T12:00:00Z"),
   active: true
 };
 
@@ -274,4 +275,21 @@ test("Rechaza el recálculo de diciembre con historial incompleto", async () => 
 
   // Verificamos que no se guardó la planilla.
   assert.equal(intentoGuardar, false);
+});
+
+test("El recálculo contempla las quincenas desde la contratación", async () => {
+  const nuevo = { ...empleado, hireDate: new Date("2026-06-16T12:00:00Z") };
+  const db = {
+    employee: { findUnique: async () => nuevo },
+    payroll: {
+      findMany: async ({ where }) => {
+        assert.equal(where.periodStart.gte.toISOString(), "2026-06-16T00:00:00.000Z");
+        return [];
+      },
+      create: async ({ data }) => data
+    }
+  };
+  await assert.rejects(guardarPlanillaQuincenal(db, 1, 2026, 6, 1, gerente), /anterior a la contratación/);
+  const recibo = await guardarPlanillaQuincenal(db, 1, 2026, 6, 2, gerente);
+  assert.equal(recibo.periodStart.getUTCDate(), 16);
 });

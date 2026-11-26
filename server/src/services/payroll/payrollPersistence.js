@@ -32,6 +32,7 @@ export async function guardarPlanillaQuincenal(
       id: true,
       branchId: true,
       salary: true,
+      hireDate: true,
       active: true
     }
   });
@@ -56,13 +57,22 @@ export async function guardarPlanillaQuincenal(
     numeroQuincena
   );
 
+  // Las fechas de la planilla representan días de calendario en UTC.
+  const ingreso = new Date(empleado.hireDate);
+  const primeraQuincena = new Date(Date.UTC(
+    ingreso.getUTCFullYear(), ingreso.getUTCMonth(), ingreso.getUTCDate() < 16 ? 1 : 16
+  ));
+  if (datosPlanilla.periodStart < primeraQuincena) {
+    throw new Error("La quincena es anterior a la contratación");
+  }
+
   // Consultamos el historial en junio y diciembre.
   if (mes === 6 || mes === 12) {
     const historial = await prisma.payroll.findMany({
       where: {
         employeeId,
         periodStart: {
-          gte: new Date(Date.UTC(anio, 0, 1)),
+          gte: new Date(Math.max(Date.UTC(anio, 0, 1), primeraQuincena.getTime())),
           lt: datosPlanilla.periodStart
         }
       },
@@ -78,43 +88,17 @@ export async function guardarPlanillaQuincenal(
       }
     });
 
-    // Ajustamos el ISR en la segunda quincena de junio.
-    if (mes === 6 && numeroQuincena === 2) {
-      const fechasEsperadas = [];
-
-      // Verificamos las quincenas de enero a mayo.
-      for (let m = 0; m < 5; m++) {
+    if (numeroQuincena === 2) {
+      const fechasGuardadas = new Set(historial.map((p) => p.periodStart.toISOString().slice(0, 10)));
+      for (let m = 0; m < mes; m++) {
         for (const dia of [1, 16]) {
-          fechasEsperadas.push(
-            new Date(Date.UTC(anio, m, dia))
-              .toISOString()
-              .slice(0, 10)
-          );
+          const fecha = new Date(Date.UTC(anio, m, dia));
+          if (fecha < primeraQuincena || fecha >= datosPlanilla.periodStart) continue;
+          if (!fechasGuardadas.has(fecha.toISOString().slice(0, 10))) {
+            const nombreMes = mes === 6 ? "junio" : "diciembre";
+            throw new Error(`No se puede recalcular ${nombreMes}: historial incompleto`);
+          }
         }
-      }
-
-      // Incluimos la primera quincena de junio.
-      fechasEsperadas.push(`${anio}-06-01`);
-
-      const fechasGuardadas = new Set(
-        historial.map(p =>
-          new Date(p.periodStart)
-            .toISOString()
-            .slice(0, 10)
-        )
-      );
-
-      // Evitamos recalcular con períodos faltantes.
-      if (
-        historial.length !== fechasEsperadas.length ||
-        fechasGuardadas.size !== fechasEsperadas.length ||
-        fechasEsperadas.some(
-          fecha => !fechasGuardadas.has(fecha)
-        )
-      ) {
-        throw new Error(
-          "No se puede recalcular junio: historial incompleto"
-        );
       }
 
       const centavos = valor =>
@@ -126,7 +110,7 @@ export async function guardarPlanillaQuincenal(
         centavos(planilla.isss) -
         centavos(planilla.afp);
 
-      // Sumamos las bases gravadas hasta junio.
+      // Sumamos las bases gravadas hasta la quincena del recálculo.
       const baseAcumulada =
         historial.reduce(
           (total, planilla) =>
@@ -134,135 +118,15 @@ export async function guardarPlanillaQuincenal(
           0
         ) + baseCentavos(datosPlanilla);
 
-      // ISR retenido de enero a mayo.
       const retenidoAnterior = historial
-        .filter(
-          p => new Date(p.periodStart).getUTCMonth() < 5
-        )
-        .reduce(
-          (total, p) =>
-            total + centavos(p.incomeTax),
-          0
-        );
-
-      // Calculamos el recálculo correspondiente a junio.
-      const totalJunio = centavos(
-        calcularRecalculoISRJunio(
-          baseAcumulada / 100,
-          retenidoAnterior / 100,
-          Number(empleado.salary) * 12
-        )
-      );
-
-      // Obtenemos la retención de la primera quincena.
-      const primeraJunio = historial.find(
-        p => new Date(p.periodStart).getUTCMonth() === 5
-      );
-
-      const isrSegunda = Math.max(
-        0,
-        totalJunio - centavos(primeraJunio.incomeTax)
-      );
-
-      // Actualizamos el salario neto.
-      const netoCentavos =
-        baseCentavos(datosPlanilla) - isrSegunda;
-
-      if (netoCentavos < 0) {
-        throw new Error("El ISR supera el salario disponible");
-      }
-
-      datosPlanilla.incomeTax =
-        (isrSegunda / 100).toFixed(2);
-
-      datosPlanilla.netSalary =
-        (netoCentavos / 100).toFixed(2);
-    }
-
-    // Ajustamos el ISR en la segunda quincena de diciembre.
-    if (mes === 12 && numeroQuincena === 2) {
-      const fechasEsperadas = [];
-
-      // Enero a noviembre y primera quincena de diciembre.
-      for (let m = 0; m < 12; m++) {
-        const dias = m === 11 ? [1] : [1, 16];
-
-        for (const dia of dias) {
-          fechasEsperadas.push(
-            new Date(Date.UTC(anio, m, dia))
-              .toISOString()
-              .slice(0, 10)
-          );
-        }
-      }
-
-      const fechasGuardadas = new Set(
-        historial.map(p =>
-          new Date(p.periodStart)
-            .toISOString()
-            .slice(0, 10)
-        )
-      );
-
-      // Verificamos las 23 quincenas anteriores.
-      if (
-        historial.length !== fechasEsperadas.length ||
-        fechasGuardadas.size !== fechasEsperadas.length ||
-        fechasEsperadas.some(
-          fecha => !fechasGuardadas.has(fecha)
-        )
-      ) {
-        throw new Error(
-          "No se puede recalcular diciembre: historial incompleto"
-        );
-      }
-
-      const centavos = valor =>
-        Math.round(Number(valor) * 100);
-
-      // Calculamos la base gravada de cada planilla.
-      const baseCentavos = planilla =>
-        centavos(planilla.grossSalary) -
-        centavos(planilla.isss) -
-        centavos(planilla.afp);
-
-      // Acumulamos la base gravada de todo el año.
-      const baseAcumulada =
-        historial.reduce(
-          (total, planilla) =>
-            total + baseCentavos(planilla),
-          0
-        ) + baseCentavos(datosPlanilla);
-
-      // Sumamos el ISR retenido de enero a noviembre.
-      const retenidoAnterior = historial
-        .filter(
-          p => new Date(p.periodStart).getUTCMonth() < 11
-        )
-        .reduce(
-          (total, p) =>
-            total + centavos(p.incomeTax),
-          0
-        );
-
-      // Calculamos el recálculo correspondiente a diciembre.
-      const totalDiciembre = centavos(
-        calcularRecalculoISRDiciembre(
-          baseAcumulada / 100,
-          retenidoAnterior / 100,
-          Number(empleado.salary) * 12
-        )
-      );
-
-      // Obtenemos el ISR de la primera quincena de diciembre.
-      const primeraDiciembre = historial.find(
-        p => new Date(p.periodStart).getUTCMonth() === 11
-      );
-
-      const isrSegunda = Math.max(
-        0,
-        totalDiciembre - centavos(primeraDiciembre.incomeTax)
-      );
+        .filter(p => p.periodStart.getUTCMonth() < mes - 1)
+        .reduce((total, p) => total + centavos(p.incomeTax), 0);
+      const recalcularISR = mes === 6 ? calcularRecalculoISRJunio : calcularRecalculoISRDiciembre;
+      const retencionMensual = centavos(recalcularISR(
+        baseAcumulada / 100, retenidoAnterior / 100, Number(empleado.salary) * 12
+      ));
+      const primeraDelMes = historial.find(p => p.periodStart.getUTCMonth() === mes - 1);
+      const isrSegunda = Math.max(0, retencionMensual - centavos(primeraDelMes?.incomeTax ?? 0));
 
       // Actualizamos el salario neto.
       const netoCentavos =

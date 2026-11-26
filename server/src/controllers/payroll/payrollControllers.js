@@ -89,7 +89,11 @@ export const createPayroll = async (req, res, next) => {
       "No puedes generar planillas de otra sucursal": 403,
       "El empleado no existe o está inactivo": 404,
       "Ya existe una planilla para este empleado y período": 409,
-      "El salario mensual debe ser mayor a cero": 400
+      "El salario mensual debe ser mayor a cero": 400,
+      "No se puede recalcular junio: historial incompleto": 409,
+      "No se puede recalcular diciembre: historial incompleto": 409,
+      "El ISR supera el salario disponible": 409,
+      "La quincena es anterior a la contratación": 400
     };
 
     const estado = estados[error.message];

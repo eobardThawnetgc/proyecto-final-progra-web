@@ -9,6 +9,7 @@ const branchScope = (req, branchId) => canManageAllBranches(req)
     ? (branchId ? { branchId } : {})
     : { branchId: req.employee.branchId };
 const relations = {
+    branch: { select: { name: true } },
     recipeItems: { include: { inventoryItem: { select: { id: true, name: true, unit: true, quantity: true, minimumStock: true } } } },
     inventoryItem: { select: { id: true, name: true, unit: true, quantity: true, minimumStock: true } },
 };
@@ -72,12 +73,12 @@ export const getProductOptions = async (req, res, next) => {
     try {
         const inventory = await prisma.inventoryItem.findMany({
             where: { ...branchScope(req), productId: null, type: { in: ['RAW_MATERIAL', 'SUPPLY'] } },
-            select: { id: true, name: true, type: true, unit: true, quantity: true, minimumStock: true },
+            select: { id: true, branchId: true, name: true, type: true, unit: true, quantity: true, minimumStock: true },
             orderBy: { name: 'asc' },
         });
         const packaged = await prisma.inventoryItem.findMany({
             where: { ...branchScope(req), productId: null, type: 'PACKAGED' },
-            select: { id: true, productId: true, name: true, unit: true, quantity: true, minimumStock: true },
+            select: { id: true, branchId: true, productId: true, name: true, unit: true, quantity: true, minimumStock: true },
             orderBy: { name: 'asc' },
         });
         return res.json({ ingredients: inventory, packagedInventory: packaged });
@@ -107,19 +108,27 @@ export const createProduct = async (req, res, next) => {
         const recipeError = await validateRecipe(prisma, branchId, recipe);
         if (recipeError) return res.status(400).json({ message: recipeError });
         if (inventoryItemId) {
-            const item = await prisma.inventoryItem.findFirst({ where: { id: inventoryItemId, branchId, productId: null } });
+            const item = await prisma.inventoryItem.findFirst({ where: { id: inventoryItemId, branchId, type: 'PACKAGED', productId: null } });
             if (!item) return res.status(400).json({ message: 'El inventario seleccionado no está disponible en esta sucursal' });
         }
-        const product = await prisma.$transaction(async (tx) => tx.product.create({
-            data: {
-                ...data, branchId,
-                ...(data.type === 'PREPARED' ? { recipeItems: { create: recipe } } : {}),
-                ...(data.type === 'PACKAGED' ? { inventoryItem: { connect: { id: inventoryItemId } } } : {}),
-            }, include: relations,
-        }));
+        const product = await prisma.$transaction(async (tx) => {
+            const created = await tx.product.create({
+                data: {
+                    ...data, branchId,
+                    ...(data.type === 'PREPARED' && { recipeItems: { create: recipe } }),
+                },
+                include: relations,
+            });
+            if (data.type !== 'PACKAGED') return created;
+            await tx.inventoryItem.update({
+                where: { id: inventoryItemId, branchId, type: 'PACKAGED', AND: { productId: null } },
+                data: { productId: created.id },
+            });
+            return tx.product.findUniqueOrThrow({ where: { id: created.id }, include: relations });
+        });
         return res.status(201).json({ message: 'Producto creado correctamente', product: serialize(product) });
     } catch (error) {
-        if (error.code === 'P2002') return res.status(409).json({ message: 'El inventario ya está vinculado a otro producto' });
+        if (error.code === 'P2002' || error.code === 'P2025') return res.status(409).json({ message: 'El inventario ya está vinculado a otro producto' });
         next(error);
     }
 };
@@ -137,6 +146,10 @@ export const updateProduct = async (req, res, next) => {
             where: { branchId: current.branchId, name: { equals: data.name, mode: 'insensitive' }, id: { not: id } },
         })) return res.status(409).json({ message: 'Ya existe un producto con ese nombre en la sucursal' });
 
+        if (data.type === undefined && data.recipe === undefined && data.inventoryItemId === undefined) {
+            const product = await prisma.product.update({ where: { id }, data, include: relations });
+            return res.json({ message: 'Producto actualizado correctamente', product: serialize(product) });
+        }
         const resultingType = data.type ?? current.type;
         const resultingRecipe = data.recipe ?? current.recipeItems.map((line) => ({
             inventoryItemId: line.inventoryItemId, quantity: Number(line.quantity),
@@ -148,7 +161,7 @@ export const updateProduct = async (req, res, next) => {
         const inventoryItemId = data.inventoryItemId ?? (resultingType === 'PACKAGED' ? current.inventoryItem?.id : null);
         if (resultingType === 'PACKAGED' && !inventoryItemId) return res.status(400).json({ message: 'Vincula el producto con su existencia de inventario' });
         if (inventoryItemId) {
-            const item = await prisma.inventoryItem.findFirst({ where: { id: inventoryItemId, branchId: current.branchId, OR: [{ productId: null }, { productId: id }] } });
+            const item = await prisma.inventoryItem.findFirst({ where: { id: inventoryItemId, branchId: current.branchId, type: 'PACKAGED', OR: [{ productId: null }, { productId: id }] } });
             if (!item) return res.status(400).json({ message: 'El inventario seleccionado no está disponible en esta sucursal' });
         }
         const { recipe, inventoryItemId: ignoredInventoryId, ...fields } = data;
@@ -157,7 +170,7 @@ export const updateProduct = async (req, res, next) => {
             if (resultingType === 'PREPARED') await tx.recipeItem.createMany({ data: resultingRecipe.map((line) => ({ ...line, productId: id })) });
             if (resultingType === 'PACKAGED' && inventoryItemId !== current.inventoryItem?.id) {
                 if (current.inventoryItem) await tx.inventoryItem.update({ where: { id: current.inventoryItem.id }, data: { productId: null } });
-                await tx.inventoryItem.update({ where: { id: inventoryItemId }, data: { productId: id } });
+                await tx.inventoryItem.update({ where: { id: inventoryItemId, branchId: current.branchId, type: 'PACKAGED', AND: { productId: null } }, data: { productId: id } });
             } else if (resultingType === 'PREPARED' && current.inventoryItem) {
                 await tx.inventoryItem.update({ where: { id: current.inventoryItem.id }, data: { productId: null } });
             }
@@ -167,7 +180,7 @@ export const updateProduct = async (req, res, next) => {
         });
         return res.json({ message: 'Producto actualizado correctamente', product: serialize(product) });
     } catch (error) {
-        if (error.code === 'P2002') return res.status(409).json({ message: 'El inventario ya está vinculado a otro producto' });
+        if (error.code === 'P2002' || error.code === 'P2025') return res.status(409).json({ message: 'El inventario ya está vinculado a otro producto' });
         next(error);
     }
 };

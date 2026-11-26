@@ -2,6 +2,7 @@ import { registerSchema, loginSchema } from "../../utils/validators/authValidato
 import bcrypt from "bcryptjs";
 import prisma from "../../../config/prisma.js";
 import { generateToken, verifyToken } from "../../utils/jwt.js";
+import { createEmployee } from "../employees/employeesControllers.js";
 
 export const register = async (req, res, next) => {
     try {
@@ -16,38 +17,9 @@ export const register = async (req, res, next) => {
             });
         }
 
-        const { name, email, password, branchId, role, position, salary } = result.data.body;
-
-        const validateEmail = await prisma.employee.findUnique({
-            where: { email: email }
-        });
-
-        if (validateEmail) return res.status(409).json({ message: "El correo ingresado ya existe" });
-
-        const SALT_ROUNDS = 12;
-        const hashPassword = await bcrypt.hash(password, SALT_ROUNDS);
-
-        const createEmployee = await prisma.employee.create({
-            data: {
-                name,
-                email,
-                password: hashPassword,
-                branchId,
-                role,
-                position,
-                salary
-            }
-        })
-
-        return res.status(201).json({
-            message: 'Empleado registrado correctamente',
-            employee: {
-                name: createEmployee.name,
-                email: createEmployee.email,
-                role: createEmployee.role,
-                branchId: createEmployee.branchId
-            }
-        });
+        const { confirmPassword, ...employee } = result.data.body;
+        req.body = employee;
+        return createEmployee(req, res, next);
 
     } catch (error) {
         next(error);

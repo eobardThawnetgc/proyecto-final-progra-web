@@ -19,7 +19,7 @@ const validationError = (res, error) =>
 
 const parseId = (req) => {
     const id = Number(req.params.id);
-    return Number.isInteger(id) && id > 0 ? id : null;
+    return Number.isInteger(id) && id > 0 && id <= 2147483647 ? id : null;
 };
 
 // Convierte Decimal a number y calcula el estado del stock.
@@ -60,6 +60,7 @@ export const getItems = async (req, res, next) => {
                 ...(search && { name: { contains: search, mode: 'insensitive' } }),
                 ...(type && { type })
             },
+            include: { branch: { select: { name: true } } },
             orderBy: { name: 'asc' }
         });
 
@@ -79,6 +80,7 @@ export const getStockAlerts = async (req, res, next) => {
     try {
         const items = await prisma.inventoryItem.findMany({
             where: branchScope(req),
+            include: { branch: { select: { name: true } } },
             orderBy: { name: 'asc' }
         });
 
@@ -118,6 +120,9 @@ export const createItem = async (req, res, next) => {
 
         const branch = await prisma.branch.findUnique({ where: { id: branchId } });
         if (!branch) return res.status(404).json({ message: 'La sucursal no existe' });
+        if (data.productId && (data.type !== 'PACKAGED' || !await prisma.product.findFirst({
+            where: { id: data.productId, branchId, type: 'PACKAGED' },
+        }))) return res.status(400).json({ message: 'Selecciona un producto empacado de la misma sucursal' });
 
         if (await nameExists(branchId, data.name)) {
             return res.status(409).json({ message: 'Ya existe un insumo con ese nombre en la sucursal' });
@@ -151,6 +156,14 @@ export const updateItem = async (req, res, next) => {
         if (!current) return res.status(404).json({ message: 'Insumo no encontrado' });
 
         const data = parsed.data.body;
+        const productId = data.productId === undefined ? current.productId : data.productId;
+        if (productId && ((data.type ?? current.type) !== 'PACKAGED' || !await prisma.product.findFirst({
+            where: { id: productId, branchId: current.branchId, type: 'PACKAGED' },
+        }))) return res.status(400).json({ message: 'Selecciona un producto empacado de la misma sucursal' });
+        if (data.type === 'PACKAGED' && current.type !== 'PACKAGED' &&
+            await prisma.recipeItem.count({ where: { inventoryItemId: id } })) {
+            return res.status(409).json({ message: 'El insumo forma parte de una receta' });
+        }
 
         if (data.name && await nameExists(current.branchId, data.name, id)) {
             return res.status(409).json({ message: 'Ya existe un insumo con ese nombre en la sucursal' });
@@ -191,21 +204,23 @@ export const adjustStock = async (req, res, next) => {
                 data: { quantity: amount }
             });
         } else if (operation === 'INCREMENT') {
-            updated = await prisma.inventoryItem.update({
-                where: { id },
-                data: { quantity: { increment: amount } }
+            const rows = await prisma.inventoryItem.updateManyAndReturn({
+                where: { id, quantity: { lt: 1000000000 - amount } },
+                data: { quantity: { increment: amount } },
             });
+            if (!rows.length) return res.status(409).json({ message: 'La entrada supera el límite de existencias' });
+            [updated] = rows;
         } else {
             // Descuento atómico: solo se aplica si alcanza el stock.
-            const { count } = await prisma.inventoryItem.updateMany({
+            const rows = await prisma.inventoryItem.updateManyAndReturn({
                 where: { id, quantity: { gte: amount } },
                 data: { quantity: { decrement: amount } }
             });
 
-            if (count === 0) {
+            if (!rows.length) {
                 return res.status(409).json({ message: 'Stock insuficiente para realizar la salida' });
             }
-            updated = await prisma.inventoryItem.findUnique({ where: { id } });
+            [updated] = rows;
         }
 
         const item = serialize(updated);
@@ -236,7 +251,8 @@ export const deleteItem = async (req, res, next) => {
             });
         }
 
-        await prisma.inventoryItem.delete({ where: { id } });
+        const { count } = await prisma.inventoryItem.deleteMany({ where: { id, productId: null, recipeItems: { none: {} } } });
+        if (!count) return res.status(409).json({ message: 'Desvincula el insumo de su producto antes de eliminarlo' });
 
         return res.status(200).json({ message: 'Insumo eliminado correctamente' });
     } catch (error) {
