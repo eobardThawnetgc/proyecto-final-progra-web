@@ -47,8 +47,11 @@ export default function PurchaseForm({ branches, homeBranchId, suppliers, close,
             date: form.get('date'),
             paidAmount: form.get('paidAmount') || '0',
             details: lines.map(({ type, inventoryItemId, description, quantity, unitCost }) => ({
-                quantity, unitCost,
-                ...(type === 'stock' ? { inventoryItemId: Number(inventoryItemId) } : { description }),
+                quantity: String(Number(quantity)), unitCost: Number(unitCost).toFixed(6),
+                ...(type === 'stock' ? {
+                    inventoryItemId: Number(inventoryItemId),
+                    expectedUnit: items.find((item) => item.id === Number(inventoryItemId)).unit,
+                } : { description }),
             })),
         });
     }
@@ -114,12 +117,12 @@ export default function PurchaseForm({ branches, homeBranchId, suppliers, close,
                                     </FormGroup></Col>
                                     <Col xs="6" md="4"><FormGroup>
                                         <Label for={`${line.key}-quantity`}>Cantidad</Label>
-                                        <Input id={`${line.key}-quantity`} type="number" min="0.001" max="999999999.999" step="0.001"
+                                        <Input id={`${line.key}-quantity`} type="number" min="1" max="999999999" step="1"
                                             value={line.quantity} required onChange={(event) => updateLine(line.key, { quantity: event.target.value })} />
                                     </FormGroup></Col>
                                     <Col xs="6" md="4"><FormGroup>
                                         <Label for={`${line.key}-cost`}>Costo unitario</Label>
-                                        <Input id={`${line.key}-cost`} type="number" min="0" max="99999999.99" step="0.01"
+                                        <Input id={`${line.key}-cost`} type="number" min="0" max="99999999.999999" step="0.000001"
                                             value={line.unitCost} required onChange={(event) => updateLine(line.key, { unitCost: event.target.value })} />
                                     </FormGroup></Col>
                                     <Col md="4" className="d-flex justify-content-between align-items-center gap-2 pb-2">

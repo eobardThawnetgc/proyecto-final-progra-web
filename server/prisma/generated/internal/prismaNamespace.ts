@@ -404,6 +404,7 @@ export const ModelName = {
   RecipeItem: 'RecipeItem',
   Supplier: 'Supplier',
   Purchase: 'Purchase',
+  PurchasePayment: 'PurchasePayment',
   PurchaseDetail: 'PurchaseDetail',
   Sale: 'Sale',
   SaleDetail: 'SaleDetail',
@@ -425,7 +426,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "branch" | "employee" | "product" | "inventoryItem" | "recipeItem" | "supplier" | "purchase" | "purchaseDetail" | "sale" | "saleDetail" | "payment" | "cashSession" | "payroll"
+    modelProps: "branch" | "employee" | "product" | "inventoryItem" | "recipeItem" | "supplier" | "purchase" | "purchasePayment" | "purchaseDetail" | "sale" | "saleDetail" | "payment" | "cashSession" | "payroll"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -944,6 +945,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.PurchaseCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.PurchaseCountAggregateOutputType> | number
+        }
+      }
+    }
+    PurchasePayment: {
+      payload: Prisma.$PurchasePaymentPayload<ExtArgs>
+      fields: Prisma.PurchasePaymentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PurchasePaymentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PurchasePaymentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PurchasePaymentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PurchasePaymentPayload>
+        }
+        findFirst: {
+          args: Prisma.PurchasePaymentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PurchasePaymentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PurchasePaymentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PurchasePaymentPayload>
+        }
+        findMany: {
+          args: Prisma.PurchasePaymentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PurchasePaymentPayload>[]
+        }
+        create: {
+          args: Prisma.PurchasePaymentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PurchasePaymentPayload>
+        }
+        createMany: {
+          args: Prisma.PurchasePaymentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PurchasePaymentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PurchasePaymentPayload>[]
+        }
+        delete: {
+          args: Prisma.PurchasePaymentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PurchasePaymentPayload>
+        }
+        update: {
+          args: Prisma.PurchasePaymentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PurchasePaymentPayload>
+        }
+        deleteMany: {
+          args: Prisma.PurchasePaymentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PurchasePaymentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PurchasePaymentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PurchasePaymentPayload>[]
+        }
+        upsert: {
+          args: Prisma.PurchasePaymentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PurchasePaymentPayload>
+        }
+        aggregate: {
+          args: Prisma.PurchasePaymentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePurchasePayment>
+        }
+        groupBy: {
+          args: Prisma.PurchasePaymentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PurchasePaymentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PurchasePaymentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PurchasePaymentCountAggregateOutputType> | number
         }
       }
     }
@@ -1518,6 +1593,20 @@ export const PurchaseScalarFieldEnum = {
 export type PurchaseScalarFieldEnum = (typeof PurchaseScalarFieldEnum)[keyof typeof PurchaseScalarFieldEnum]
 
 
+export const PurchasePaymentScalarFieldEnum = {
+  id: 'id',
+  purchaseId: 'purchaseId',
+  employeeId: 'employeeId',
+  amount: 'amount',
+  createdAt: 'createdAt',
+  imported: 'imported',
+  reversesId: 'reversesId',
+  reason: 'reason'
+} as const
+
+export type PurchasePaymentScalarFieldEnum = (typeof PurchasePaymentScalarFieldEnum)[keyof typeof PurchasePaymentScalarFieldEnum]
+
+
 export const PurchaseDetailScalarFieldEnum = {
   id: 'id',
   purchaseId: 'purchaseId',
@@ -1969,6 +2058,7 @@ export type GlobalOmitConfig = {
   recipeItem?: Prisma.RecipeItemOmit
   supplier?: Prisma.SupplierOmit
   purchase?: Prisma.PurchaseOmit
+  purchasePayment?: Prisma.PurchasePaymentOmit
   purchaseDetail?: Prisma.PurchaseDetailOmit
   sale?: Prisma.SaleOmit
   saleDetail?: Prisma.SaleDetailOmit

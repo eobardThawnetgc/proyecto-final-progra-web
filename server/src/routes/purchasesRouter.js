@@ -3,7 +3,7 @@ import { authenticate } from '../middleware/authMiddleware.js';
 import { authorize } from '../middleware/roleMiddleware.js';
 import {
     getBranches, getSuppliers, createSupplier, updateSupplier,
-    getPurchases, createPurchase, updatePaidAmount,
+    getPurchases, createPurchase, updatePaidAmount, reversePurchasePayment,
 } from '../controllers/purchases/purchasesControllers.js';
 
 const purchasesRouter = express.Router();
@@ -16,5 +16,6 @@ purchasesRouter.put('/suppliers/:id', updateSupplier);
 purchasesRouter.get('/', getPurchases);
 purchasesRouter.post('/', createPurchase);
 purchasesRouter.patch('/:id/payment', updatePaidAmount);
+purchasesRouter.post('/:id/payments/:paymentId/reversal', reversePurchasePayment);
 
 export default purchasesRouter;

@@ -137,7 +137,10 @@ export default function PurchasesPage() {
             {dialog?.type === 'purchase' && <PurchaseForm branches={branches} homeBranchId={employee.branchId} suppliers={suppliers}
                 {...{ close, saving, error }} save={(data) => save(() => purchasesService.create(data), 'Compra registrada')} />}
             {dialog?.type === 'detail' && selectedPurchase && <PurchaseDetails purchase={selectedPurchase} {...{ close, saving, error }}
-                save={(id, amount) => save(() => purchasesService.updatePayment(id, amount), 'Pago actualizado')} />}
+                save={(id, payment) => save(() => purchasesService.updatePayment(id, payment), 'Pago actualizado')}
+                reverse={(paymentId, reason) => save(
+                    () => purchasesService.reversePayment(selectedPurchase.id, paymentId, reason), 'Abono revertido',
+                )} />}
         </main>
     );
 }

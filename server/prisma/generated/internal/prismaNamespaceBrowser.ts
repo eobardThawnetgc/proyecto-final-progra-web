@@ -58,6 +58,7 @@ export const ModelName = {
   RecipeItem: 'RecipeItem',
   Supplier: 'Supplier',
   Purchase: 'Purchase',
+  PurchasePayment: 'PurchasePayment',
   PurchaseDetail: 'PurchaseDetail',
   Sale: 'Sale',
   SaleDetail: 'SaleDetail',
@@ -168,6 +169,20 @@ export const PurchaseScalarFieldEnum = {
 } as const
 
 export type PurchaseScalarFieldEnum = (typeof PurchaseScalarFieldEnum)[keyof typeof PurchaseScalarFieldEnum]
+
+
+export const PurchasePaymentScalarFieldEnum = {
+  id: 'id',
+  purchaseId: 'purchaseId',
+  employeeId: 'employeeId',
+  amount: 'amount',
+  createdAt: 'createdAt',
+  imported: 'imported',
+  reversesId: 'reversesId',
+  reason: 'reason'
+} as const
+
+export type PurchasePaymentScalarFieldEnum = (typeof PurchasePaymentScalarFieldEnum)[keyof typeof PurchasePaymentScalarFieldEnum]
 
 
 export const PurchaseDetailScalarFieldEnum = {

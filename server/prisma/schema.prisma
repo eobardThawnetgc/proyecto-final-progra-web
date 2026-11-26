@@ -100,6 +100,7 @@ model Employee {
   sales        Sale[]
   cashSessions CashSession[]
   payrolls     Payroll[]
+  purchasePayments PurchasePayment[]
 }
 
 // ─── 3. PRODUCTOS DEL MENÚ ───
@@ -183,6 +184,25 @@ model Purchase {
   branch   Branch          @relation(fields: [branchId], references: [id])
   supplier Supplier        @relation(fields: [supplierId], references: [id])
   details  PurchaseDetail[]
+  payments PurchasePayment[]
+}
+
+model PurchasePayment {
+  id         Int      @id @default(autoincrement())
+  purchaseId Int
+  employeeId Int?
+  amount     Decimal  @db.Decimal(12, 2)
+  createdAt  DateTime @default(now())
+  imported   Boolean  @default(false)
+  reversesId Int?     @unique
+  reason     String?
+
+  purchase Purchase         @relation(fields: [purchaseId], references: [id])
+  employee Employee?        @relation(fields: [employeeId], references: [id], onDelete: SetNull)
+  reverses PurchasePayment? @relation("PurchasePaymentReversal", fields: [reversesId], references: [id], onDelete: Restrict)
+  reversal PurchasePayment? @relation("PurchasePaymentReversal")
+
+  @@index([purchaseId, id])
 }
 
 // ─── 8. DETALLES DE COMPRAS ───
@@ -193,7 +213,7 @@ model PurchaseDetail {
   inventoryItemId Int?
   description     String
   quantity        Decimal  @db.Decimal(12, 3)
-  unitCost        Decimal  @db.Decimal(10, 2)
+  unitCost        Decimal  @db.Decimal(14, 6)
   subtotal        Decimal  @db.Decimal(12, 2)
 
   // inventoryItemId puede ser nulo para registrar gastos

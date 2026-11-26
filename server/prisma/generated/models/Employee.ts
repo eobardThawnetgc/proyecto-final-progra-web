@@ -268,6 +268,7 @@ export type EmployeeWhereInput = {
   sales?: Prisma.SaleListRelationFilter
   cashSessions?: Prisma.CashSessionListRelationFilter
   payrolls?: Prisma.PayrollListRelationFilter
+  purchasePayments?: Prisma.PurchasePaymentListRelationFilter
 }
 
 export type EmployeeOrderByWithRelationInput = {
@@ -285,6 +286,7 @@ export type EmployeeOrderByWithRelationInput = {
   sales?: Prisma.SaleOrderByRelationAggregateInput
   cashSessions?: Prisma.CashSessionOrderByRelationAggregateInput
   payrolls?: Prisma.PayrollOrderByRelationAggregateInput
+  purchasePayments?: Prisma.PurchasePaymentOrderByRelationAggregateInput
 }
 
 export type EmployeeWhereUniqueInput = Prisma.AtLeast<{
@@ -305,6 +307,7 @@ export type EmployeeWhereUniqueInput = Prisma.AtLeast<{
   sales?: Prisma.SaleListRelationFilter
   cashSessions?: Prisma.CashSessionListRelationFilter
   payrolls?: Prisma.PayrollListRelationFilter
+  purchasePayments?: Prisma.PurchasePaymentListRelationFilter
 }, "id" | "email">
 
 export type EmployeeOrderByWithAggregationInput = {
@@ -354,6 +357,7 @@ export type EmployeeCreateInput = {
   sales?: Prisma.SaleCreateNestedManyWithoutEmployeeInput
   cashSessions?: Prisma.CashSessionCreateNestedManyWithoutEmployeeInput
   payrolls?: Prisma.PayrollCreateNestedManyWithoutEmployeeInput
+  purchasePayments?: Prisma.PurchasePaymentCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeUncheckedCreateInput = {
@@ -370,6 +374,7 @@ export type EmployeeUncheckedCreateInput = {
   sales?: Prisma.SaleUncheckedCreateNestedManyWithoutEmployeeInput
   cashSessions?: Prisma.CashSessionUncheckedCreateNestedManyWithoutEmployeeInput
   payrolls?: Prisma.PayrollUncheckedCreateNestedManyWithoutEmployeeInput
+  purchasePayments?: Prisma.PurchasePaymentUncheckedCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeUpdateInput = {
@@ -385,6 +390,7 @@ export type EmployeeUpdateInput = {
   sales?: Prisma.SaleUpdateManyWithoutEmployeeNestedInput
   cashSessions?: Prisma.CashSessionUpdateManyWithoutEmployeeNestedInput
   payrolls?: Prisma.PayrollUpdateManyWithoutEmployeeNestedInput
+  purchasePayments?: Prisma.PurchasePaymentUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeUncheckedUpdateInput = {
@@ -401,6 +407,7 @@ export type EmployeeUncheckedUpdateInput = {
   sales?: Prisma.SaleUncheckedUpdateManyWithoutEmployeeNestedInput
   cashSessions?: Prisma.CashSessionUncheckedUpdateManyWithoutEmployeeNestedInput
   payrolls?: Prisma.PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
+  purchasePayments?: Prisma.PurchasePaymentUncheckedUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeCreateManyInput = {
@@ -501,6 +508,11 @@ export type EmployeeSumOrderByAggregateInput = {
   salary?: Prisma.SortOrder
 }
 
+export type EmployeeNullableScalarRelationFilter = {
+  is?: Prisma.EmployeeWhereInput | null
+  isNot?: Prisma.EmployeeWhereInput | null
+}
+
 export type EmployeeScalarRelationFilter = {
   is?: Prisma.EmployeeWhereInput
   isNot?: Prisma.EmployeeWhereInput
@@ -568,6 +580,22 @@ export type BoolFieldUpdateOperationsInput = {
   set?: boolean
 }
 
+export type EmployeeCreateNestedOneWithoutPurchasePaymentsInput = {
+  create?: Prisma.XOR<Prisma.EmployeeCreateWithoutPurchasePaymentsInput, Prisma.EmployeeUncheckedCreateWithoutPurchasePaymentsInput>
+  connectOrCreate?: Prisma.EmployeeCreateOrConnectWithoutPurchasePaymentsInput
+  connect?: Prisma.EmployeeWhereUniqueInput
+}
+
+export type EmployeeUpdateOneWithoutPurchasePaymentsNestedInput = {
+  create?: Prisma.XOR<Prisma.EmployeeCreateWithoutPurchasePaymentsInput, Prisma.EmployeeUncheckedCreateWithoutPurchasePaymentsInput>
+  connectOrCreate?: Prisma.EmployeeCreateOrConnectWithoutPurchasePaymentsInput
+  upsert?: Prisma.EmployeeUpsertWithoutPurchasePaymentsInput
+  disconnect?: Prisma.EmployeeWhereInput | boolean
+  delete?: Prisma.EmployeeWhereInput | boolean
+  connect?: Prisma.EmployeeWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.EmployeeUpdateToOneWithWhereWithoutPurchasePaymentsInput, Prisma.EmployeeUpdateWithoutPurchasePaymentsInput>, Prisma.EmployeeUncheckedUpdateWithoutPurchasePaymentsInput>
+}
+
 export type EmployeeCreateNestedOneWithoutSalesInput = {
   create?: Prisma.XOR<Prisma.EmployeeCreateWithoutSalesInput, Prisma.EmployeeUncheckedCreateWithoutSalesInput>
   connectOrCreate?: Prisma.EmployeeCreateOrConnectWithoutSalesInput
@@ -622,6 +650,7 @@ export type EmployeeCreateWithoutBranchInput = {
   sales?: Prisma.SaleCreateNestedManyWithoutEmployeeInput
   cashSessions?: Prisma.CashSessionCreateNestedManyWithoutEmployeeInput
   payrolls?: Prisma.PayrollCreateNestedManyWithoutEmployeeInput
+  purchasePayments?: Prisma.PurchasePaymentCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeUncheckedCreateWithoutBranchInput = {
@@ -637,6 +666,7 @@ export type EmployeeUncheckedCreateWithoutBranchInput = {
   sales?: Prisma.SaleUncheckedCreateNestedManyWithoutEmployeeInput
   cashSessions?: Prisma.CashSessionUncheckedCreateNestedManyWithoutEmployeeInput
   payrolls?: Prisma.PayrollUncheckedCreateNestedManyWithoutEmployeeInput
+  purchasePayments?: Prisma.PurchasePaymentUncheckedCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeCreateOrConnectWithoutBranchInput = {
@@ -681,6 +711,84 @@ export type EmployeeScalarWhereInput = {
   active?: Prisma.BoolFilter<"Employee"> | boolean
 }
 
+export type EmployeeCreateWithoutPurchasePaymentsInput = {
+  name: string
+  email: string
+  password: string
+  role?: $Enums.UserRole
+  position: string
+  salary: runtime.Decimal | runtime.DecimalJsLike | number | string
+  hireDate?: Date | string
+  active?: boolean
+  branch: Prisma.BranchCreateNestedOneWithoutEmployeesInput
+  sales?: Prisma.SaleCreateNestedManyWithoutEmployeeInput
+  cashSessions?: Prisma.CashSessionCreateNestedManyWithoutEmployeeInput
+  payrolls?: Prisma.PayrollCreateNestedManyWithoutEmployeeInput
+}
+
+export type EmployeeUncheckedCreateWithoutPurchasePaymentsInput = {
+  id?: number
+  branchId: number
+  name: string
+  email: string
+  password: string
+  role?: $Enums.UserRole
+  position: string
+  salary: runtime.Decimal | runtime.DecimalJsLike | number | string
+  hireDate?: Date | string
+  active?: boolean
+  sales?: Prisma.SaleUncheckedCreateNestedManyWithoutEmployeeInput
+  cashSessions?: Prisma.CashSessionUncheckedCreateNestedManyWithoutEmployeeInput
+  payrolls?: Prisma.PayrollUncheckedCreateNestedManyWithoutEmployeeInput
+}
+
+export type EmployeeCreateOrConnectWithoutPurchasePaymentsInput = {
+  where: Prisma.EmployeeWhereUniqueInput
+  create: Prisma.XOR<Prisma.EmployeeCreateWithoutPurchasePaymentsInput, Prisma.EmployeeUncheckedCreateWithoutPurchasePaymentsInput>
+}
+
+export type EmployeeUpsertWithoutPurchasePaymentsInput = {
+  update: Prisma.XOR<Prisma.EmployeeUpdateWithoutPurchasePaymentsInput, Prisma.EmployeeUncheckedUpdateWithoutPurchasePaymentsInput>
+  create: Prisma.XOR<Prisma.EmployeeCreateWithoutPurchasePaymentsInput, Prisma.EmployeeUncheckedCreateWithoutPurchasePaymentsInput>
+  where?: Prisma.EmployeeWhereInput
+}
+
+export type EmployeeUpdateToOneWithWhereWithoutPurchasePaymentsInput = {
+  where?: Prisma.EmployeeWhereInput
+  data: Prisma.XOR<Prisma.EmployeeUpdateWithoutPurchasePaymentsInput, Prisma.EmployeeUncheckedUpdateWithoutPurchasePaymentsInput>
+}
+
+export type EmployeeUpdateWithoutPurchasePaymentsInput = {
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  position?: Prisma.StringFieldUpdateOperationsInput | string
+  salary?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  branch?: Prisma.BranchUpdateOneRequiredWithoutEmployeesNestedInput
+  sales?: Prisma.SaleUpdateManyWithoutEmployeeNestedInput
+  cashSessions?: Prisma.CashSessionUpdateManyWithoutEmployeeNestedInput
+  payrolls?: Prisma.PayrollUpdateManyWithoutEmployeeNestedInput
+}
+
+export type EmployeeUncheckedUpdateWithoutPurchasePaymentsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  branchId?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  position?: Prisma.StringFieldUpdateOperationsInput | string
+  salary?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  sales?: Prisma.SaleUncheckedUpdateManyWithoutEmployeeNestedInput
+  cashSessions?: Prisma.CashSessionUncheckedUpdateManyWithoutEmployeeNestedInput
+  payrolls?: Prisma.PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
+}
+
 export type EmployeeCreateWithoutSalesInput = {
   name: string
   email: string
@@ -693,6 +801,7 @@ export type EmployeeCreateWithoutSalesInput = {
   branch: Prisma.BranchCreateNestedOneWithoutEmployeesInput
   cashSessions?: Prisma.CashSessionCreateNestedManyWithoutEmployeeInput
   payrolls?: Prisma.PayrollCreateNestedManyWithoutEmployeeInput
+  purchasePayments?: Prisma.PurchasePaymentCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeUncheckedCreateWithoutSalesInput = {
@@ -708,6 +817,7 @@ export type EmployeeUncheckedCreateWithoutSalesInput = {
   active?: boolean
   cashSessions?: Prisma.CashSessionUncheckedCreateNestedManyWithoutEmployeeInput
   payrolls?: Prisma.PayrollUncheckedCreateNestedManyWithoutEmployeeInput
+  purchasePayments?: Prisma.PurchasePaymentUncheckedCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeCreateOrConnectWithoutSalesInput = {
@@ -738,6 +848,7 @@ export type EmployeeUpdateWithoutSalesInput = {
   branch?: Prisma.BranchUpdateOneRequiredWithoutEmployeesNestedInput
   cashSessions?: Prisma.CashSessionUpdateManyWithoutEmployeeNestedInput
   payrolls?: Prisma.PayrollUpdateManyWithoutEmployeeNestedInput
+  purchasePayments?: Prisma.PurchasePaymentUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutSalesInput = {
@@ -753,6 +864,7 @@ export type EmployeeUncheckedUpdateWithoutSalesInput = {
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cashSessions?: Prisma.CashSessionUncheckedUpdateManyWithoutEmployeeNestedInput
   payrolls?: Prisma.PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
+  purchasePayments?: Prisma.PurchasePaymentUncheckedUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeCreateWithoutCashSessionsInput = {
@@ -767,6 +879,7 @@ export type EmployeeCreateWithoutCashSessionsInput = {
   branch: Prisma.BranchCreateNestedOneWithoutEmployeesInput
   sales?: Prisma.SaleCreateNestedManyWithoutEmployeeInput
   payrolls?: Prisma.PayrollCreateNestedManyWithoutEmployeeInput
+  purchasePayments?: Prisma.PurchasePaymentCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeUncheckedCreateWithoutCashSessionsInput = {
@@ -782,6 +895,7 @@ export type EmployeeUncheckedCreateWithoutCashSessionsInput = {
   active?: boolean
   sales?: Prisma.SaleUncheckedCreateNestedManyWithoutEmployeeInput
   payrolls?: Prisma.PayrollUncheckedCreateNestedManyWithoutEmployeeInput
+  purchasePayments?: Prisma.PurchasePaymentUncheckedCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeCreateOrConnectWithoutCashSessionsInput = {
@@ -812,6 +926,7 @@ export type EmployeeUpdateWithoutCashSessionsInput = {
   branch?: Prisma.BranchUpdateOneRequiredWithoutEmployeesNestedInput
   sales?: Prisma.SaleUpdateManyWithoutEmployeeNestedInput
   payrolls?: Prisma.PayrollUpdateManyWithoutEmployeeNestedInput
+  purchasePayments?: Prisma.PurchasePaymentUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutCashSessionsInput = {
@@ -827,6 +942,7 @@ export type EmployeeUncheckedUpdateWithoutCashSessionsInput = {
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sales?: Prisma.SaleUncheckedUpdateManyWithoutEmployeeNestedInput
   payrolls?: Prisma.PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
+  purchasePayments?: Prisma.PurchasePaymentUncheckedUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeCreateWithoutPayrollsInput = {
@@ -841,6 +957,7 @@ export type EmployeeCreateWithoutPayrollsInput = {
   branch: Prisma.BranchCreateNestedOneWithoutEmployeesInput
   sales?: Prisma.SaleCreateNestedManyWithoutEmployeeInput
   cashSessions?: Prisma.CashSessionCreateNestedManyWithoutEmployeeInput
+  purchasePayments?: Prisma.PurchasePaymentCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeUncheckedCreateWithoutPayrollsInput = {
@@ -856,6 +973,7 @@ export type EmployeeUncheckedCreateWithoutPayrollsInput = {
   active?: boolean
   sales?: Prisma.SaleUncheckedCreateNestedManyWithoutEmployeeInput
   cashSessions?: Prisma.CashSessionUncheckedCreateNestedManyWithoutEmployeeInput
+  purchasePayments?: Prisma.PurchasePaymentUncheckedCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeCreateOrConnectWithoutPayrollsInput = {
@@ -886,6 +1004,7 @@ export type EmployeeUpdateWithoutPayrollsInput = {
   branch?: Prisma.BranchUpdateOneRequiredWithoutEmployeesNestedInput
   sales?: Prisma.SaleUpdateManyWithoutEmployeeNestedInput
   cashSessions?: Prisma.CashSessionUpdateManyWithoutEmployeeNestedInput
+  purchasePayments?: Prisma.PurchasePaymentUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutPayrollsInput = {
@@ -901,6 +1020,7 @@ export type EmployeeUncheckedUpdateWithoutPayrollsInput = {
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sales?: Prisma.SaleUncheckedUpdateManyWithoutEmployeeNestedInput
   cashSessions?: Prisma.CashSessionUncheckedUpdateManyWithoutEmployeeNestedInput
+  purchasePayments?: Prisma.PurchasePaymentUncheckedUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeCreateManyBranchInput = {
@@ -927,6 +1047,7 @@ export type EmployeeUpdateWithoutBranchInput = {
   sales?: Prisma.SaleUpdateManyWithoutEmployeeNestedInput
   cashSessions?: Prisma.CashSessionUpdateManyWithoutEmployeeNestedInput
   payrolls?: Prisma.PayrollUpdateManyWithoutEmployeeNestedInput
+  purchasePayments?: Prisma.PurchasePaymentUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutBranchInput = {
@@ -942,6 +1063,7 @@ export type EmployeeUncheckedUpdateWithoutBranchInput = {
   sales?: Prisma.SaleUncheckedUpdateManyWithoutEmployeeNestedInput
   cashSessions?: Prisma.CashSessionUncheckedUpdateManyWithoutEmployeeNestedInput
   payrolls?: Prisma.PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
+  purchasePayments?: Prisma.PurchasePaymentUncheckedUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeUncheckedUpdateManyWithoutBranchInput = {
@@ -965,12 +1087,14 @@ export type EmployeeCountOutputType = {
   sales: number
   cashSessions: number
   payrolls: number
+  purchasePayments: number
 }
 
 export type EmployeeCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sales?: boolean | EmployeeCountOutputTypeCountSalesArgs
   cashSessions?: boolean | EmployeeCountOutputTypeCountCashSessionsArgs
   payrolls?: boolean | EmployeeCountOutputTypeCountPayrollsArgs
+  purchasePayments?: boolean | EmployeeCountOutputTypeCountPurchasePaymentsArgs
 }
 
 /**
@@ -1004,6 +1128,13 @@ export type EmployeeCountOutputTypeCountPayrollsArgs<ExtArgs extends runtime.Typ
   where?: Prisma.PayrollWhereInput
 }
 
+/**
+ * EmployeeCountOutputType without action
+ */
+export type EmployeeCountOutputTypeCountPurchasePaymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PurchasePaymentWhereInput
+}
+
 
 export type EmployeeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1020,6 +1151,7 @@ export type EmployeeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   sales?: boolean | Prisma.Employee$salesArgs<ExtArgs>
   cashSessions?: boolean | Prisma.Employee$cashSessionsArgs<ExtArgs>
   payrolls?: boolean | Prisma.Employee$payrollsArgs<ExtArgs>
+  purchasePayments?: boolean | Prisma.Employee$purchasePaymentsArgs<ExtArgs>
   _count?: boolean | Prisma.EmployeeCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["employee"]>
 
@@ -1070,6 +1202,7 @@ export type EmployeeInclude<ExtArgs extends runtime.Types.Extensions.InternalArg
   sales?: boolean | Prisma.Employee$salesArgs<ExtArgs>
   cashSessions?: boolean | Prisma.Employee$cashSessionsArgs<ExtArgs>
   payrolls?: boolean | Prisma.Employee$payrollsArgs<ExtArgs>
+  purchasePayments?: boolean | Prisma.Employee$purchasePaymentsArgs<ExtArgs>
   _count?: boolean | Prisma.EmployeeCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type EmployeeIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1086,6 +1219,7 @@ export type $EmployeePayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     sales: Prisma.$SalePayload<ExtArgs>[]
     cashSessions: Prisma.$CashSessionPayload<ExtArgs>[]
     payrolls: Prisma.$PayrollPayload<ExtArgs>[]
+    purchasePayments: Prisma.$PurchasePaymentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1496,6 +1630,7 @@ export interface Prisma__EmployeeClient<T, Null = never, ExtArgs extends runtime
   sales<T extends Prisma.Employee$salesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$salesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SalePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   cashSessions<T extends Prisma.Employee$cashSessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$cashSessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CashSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   payrolls<T extends Prisma.Employee$payrollsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$payrollsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PayrollPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  purchasePayments<T extends Prisma.Employee$purchasePaymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$purchasePaymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PurchasePaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2005,6 +2140,30 @@ export type Employee$payrollsArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   distinct?: Prisma.PayrollScalarFieldEnum | Prisma.PayrollScalarFieldEnum[]
+}
+
+/**
+ * Employee.purchasePayments
+ */
+export type Employee$purchasePaymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PurchasePayment
+   */
+  select?: Prisma.PurchasePaymentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PurchasePayment
+   */
+  omit?: Prisma.PurchasePaymentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PurchasePaymentInclude<ExtArgs> | null
+  where?: Prisma.PurchasePaymentWhereInput
+  orderBy?: Prisma.PurchasePaymentOrderByWithRelationInput | Prisma.PurchasePaymentOrderByWithRelationInput[]
+  cursor?: Prisma.PurchasePaymentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PurchasePaymentScalarFieldEnum | Prisma.PurchasePaymentScalarFieldEnum[]
 }
 
 /**

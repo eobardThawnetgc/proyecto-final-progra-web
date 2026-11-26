@@ -53,6 +53,11 @@ export type Supplier = Prisma.SupplierModel
  */
 export type Purchase = Prisma.PurchaseModel
 /**
+ * Model PurchasePayment
+ *
+ */
+export type PurchasePayment = Prisma.PurchasePaymentModel
+/**
  * Model PurchaseDetail
  * 
  */
