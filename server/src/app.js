@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import authRouter from "./routes/authRouter.js";
 import inventoryRouter from "./routes/inventoryRouter.js";
 import purchasesRouter from "./routes/purchasesRouter.js";
+import employeesRouter from "./routes/employeesRouter.js";
 import salesRouter from "./routes/salesRouter.js";
 import cashRouter from "./routes/cashRouter.js";
 import billingRouter from "./routes/billingRouter.js";
@@ -28,6 +29,7 @@ app.use("/api/inventory", inventoryRouter);
 app.use("/api/payroll", payrollRouter);
 //Rutas del modulo de Nomina
 app.use("/api/purchases", purchasesRouter);
+app.use("/api/employees", employeesRouter);
 app.use("/api/sales", salesRouter);
 app.use("/api/cash", cashRouter);
 app.use("/api/billing", billingRouter);
