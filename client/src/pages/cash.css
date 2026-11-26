@@ -1,0 +1,136 @@
+.cash-page {
+    min-height: 100vh;
+    background: #f3efe6;
+    color: #28392e;
+}
+
+.cash-header {
+    background: #344c3b;
+    color: #fffefa;
+}
+
+.cash-brand {
+    font-weight: 700;
+    letter-spacing: .04em;
+}
+
+.cash-brand i {
+    margin-right: .45rem;
+}
+
+.cash-header-link {
+    color: #fffefa;
+    text-decoration: none;
+}
+
+.cash-header-link:hover {
+    color: #dce9dc;
+    text-decoration: underline;
+}
+
+.cash-title {
+    font-family: Georgia, serif;
+    font-size: clamp(1.9rem, 4vw, 2.75rem);
+}
+
+.cash-card {
+    border-color: #e4dfd4;
+    border-radius: .85rem;
+    background: #fffefa;
+}
+
+.cash-opening-balance {
+    display: grid;
+    gap: .15rem;
+    text-align: right;
+}
+
+.cash-opening-balance small {
+    color: #67756b;
+}
+
+.cash-opening-balance strong {
+    font-size: 1.35rem;
+}
+
+.cash-table {
+    --bs-table-bg: #fffefa;
+}
+
+.cash-table thead {
+    --bs-table-bg: #f8f5ee;
+}
+
+.cash-table :is(th, td) {
+    padding: .8rem 1rem;
+}
+
+.cash-history-detail > td {
+    background: #f8f5ee;
+}
+
+.cash-history-methods {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+    gap: .75rem;
+}
+
+.cash-history-methods > div {
+    display: grid;
+    gap: .2rem;
+    padding: .8rem;
+    border: 1px solid #e4dfd4;
+    border-radius: .6rem;
+    background: #fffefa;
+    font-size: .9rem;
+}
+
+.cash-count-cell {
+    min-width: 190px;
+    max-width: 230px;
+}
+
+.cash-count-cell input {
+    min-width: 135px;
+}
+
+.cash-empty {
+    text-align: center;
+}
+
+.cash-empty-icon {
+    display: grid;
+    width: 3.5rem;
+    height: 3.5rem;
+    margin: 0 auto 1rem;
+    place-items: center;
+    border-radius: 50%;
+    background: #e9f0e9;
+    color: #344c3b;
+    font-size: 1.6rem;
+}
+
+.cash-empty p {
+    max-width: 32rem;
+    margin: 0 auto 1.25rem;
+}
+
+.cash-open-form {
+    max-width: 22rem;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.cash-open-form button {
+    width: 100%;
+}
+
+@media (max-width: 575.98px) {
+    .cash-opening-balance {
+        text-align: left;
+    }
+
+    .cash-table :is(th, td) {
+        padding: .7rem;
+    }
+}

@@ -6,12 +6,36 @@ import LoginPage from "../pages/auth/login";
 import { getCurrentUser } from "../services/authService.js";
 import { purchasesService } from "../services/purchasesService.js";
 import { employeesService } from "../services/employeesService.js";
+import { cashService } from "../services/cashService.js";
+import { billingService } from "../services/billingService.js";
 
 
 export const AppRouter = createBrowserRouter([
     {
         path: "/dashboard",
-        loader: () => redirect("/compras"),
+        loader: async () => {
+            try {
+                const { employee } = await getCurrentUser();
+                return redirect(employee.role === 'CASHIER' ? '/caja' : '/compras');
+            } catch (error) {
+                if (error.status === 401) return redirect('/auth/login');
+                throw error;
+            }
+        },
+    },
+    {
+        path: "/ventas",
+        loader: async () => {
+            try {
+                const { employee } = await getCurrentUser();
+                return { employee };
+            } catch (error) {
+                if (error.status === 401) return redirect("/auth/login");
+                throw error;
+            }
+        },
+        lazy: async () => ({ Component: (await import("../pages/PosPage.jsx")).default }),
+        errorElement: <ErrorPage />,
     },
     {
         path: "/compras",
@@ -48,6 +72,39 @@ export const AppRouter = createBrowserRouter([
             }
         },
         lazy: async () => ({ Component: (await import("../pages/EmployeesPage.jsx")).default }),
+      errorElement: <ErrorPage />,
+      },
+      {
+        path: "/caja",
+        loader: async () => {
+            try {
+                const { employee } = await getCurrentUser();
+                if (!['ADMIN', 'MANAGER', 'CASHIER'].includes(employee.role)) return redirect('/compras');
+                const [current, history] = await Promise.all([
+                    cashService.current(), cashService.sessions(),
+                ]);
+                return { employee, session: current.session, sessions: history.sessions };
+            } catch (error) {
+                if (error.status === 401) return redirect('/auth/login');
+                throw error;
+            }
+        },
+        lazy: async () => ({ Component: (await import("../pages/CashPage.jsx")).default }),
+        errorElement: <ErrorPage />,
+    },
+    {
+        path: "/facturacion",
+        loader: async () => {
+            try {
+                const { employee } = await getCurrentUser();
+                if (!['ADMIN', 'MANAGER', 'CASHIER'].includes(employee.role)) return redirect('/compras');
+                return { employee, ...(await billingService.data()) };
+            } catch (error) {
+                if (error.status === 401) return redirect('/auth/login');
+                throw error;
+            }
+        },
+        lazy: async () => ({ Component: (await import("../pages/BillingPage.jsx")).default }),
         errorElement: <ErrorPage />,
     },
     {

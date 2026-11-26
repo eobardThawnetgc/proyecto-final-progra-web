@@ -211,6 +211,9 @@ model Sale {
   cashSessionId  Int?
   documentType   DocumentType
   documentNumber Int
+  customerName   String?
+  customerNit    String?
+  customerNrc    String?
   date           DateTime     @default(now())
   subtotal       Decimal      @db.Decimal(12, 2)
   tax            Decimal      @db.Decimal(12, 2)
@@ -259,20 +262,26 @@ model Payment {
 // ─── 12. CAJA ───
 
 model CashSession {
-  id            Int        @id @default(autoincrement())
-  branchId      Int
-  employeeId    Int
-  openingAmount Decimal    @db.Decimal(12, 2)
-  closingAmount Decimal?   @db.Decimal(12, 2)
-  openedAt      DateTime   @default(now())
-  closedAt      DateTime?
-  status        CashStatus @default(OPEN)
+  id                      Int        @id @default(autoincrement())
+  branchId                Int
+  employeeId              Int
+  openingAmount           Decimal    @db.Decimal(12, 2)
+  closingAmount           Decimal?   @db.Decimal(12, 2)
+  closingCardAmount       Decimal?   @db.Decimal(12, 2)
+  closingDigitalAmount    Decimal?   @db.Decimal(12, 2)
+  closingBitcoinAmount    Decimal?   @db.Decimal(12, 2)
+  closingChivoWalletAmount Decimal?  @db.Decimal(12, 2)
+  openedAt                DateTime   @default(now())
+  closedAt                DateTime?
+  status                  CashStatus @default(OPEN)
 
-  // closingAmount representa el efectivo contado físicamente.
-  // Los demás métodos se cuadran a partir de los pagos registrados.
+  // Los campos closing* guardan el monto contado o confirmado al cierre.
+  // Los montos esperados por método se calculan desde los pagos de las ventas.
   branch   Branch    @relation(fields: [branchId], references: [id])
   employee Employee  @relation(fields: [employeeId], references: [id])
   sales    Sale[]
+
+  @@index([employeeId, status, openedAt])
 }
 
 // ─── 13. PLANILLA ───

@@ -5,7 +5,11 @@ import authRouter from "./routes/authRouter.js";
 import inventoryRouter from "./routes/inventoryRouter.js";
 import purchasesRouter from "./routes/purchasesRouter.js";
 import employeesRouter from "./routes/employeesRouter.js";
+import salesRouter from "./routes/salesRouter.js";
+import cashRouter from "./routes/cashRouter.js";
+import billingRouter from "./routes/billingRouter.js";
 import { errorMiddleware } from "./middleware/errorMiddleware.js";
+import payrollRouter from "./routes/payrollRouter.js";
 
 const app = express();
 
@@ -18,10 +22,17 @@ app.use(cors({
 // Middlewares globales
 app.use(express.json());
 app.use(cookieParser());
+
 app.use("/api/auth", authRouter);
 app.use("/api/inventory", inventoryRouter);
+// Rutas del módulo de Nómina.
+app.use("/api/payroll", payrollRouter);
+//Rutas del modulo de Nomina
 app.use("/api/purchases", purchasesRouter);
 app.use("/api/employees", employeesRouter);
+app.use("/api/sales", salesRouter);
+app.use("/api/cash", cashRouter);
+app.use("/api/billing", billingRouter);
 
 // Ruta de comprobación
 app.get("/api/health", (req, res) => {

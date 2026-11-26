@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useLoaderData, useNavigate, useRevalidator } from 'react-router-dom';
+import { Link, useLoaderData, useNavigate, useRevalidator } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Alert, Badge, Button, Card, Container, Input, Label, Table } from 'reactstrap';
 import PurchaseForm from '../components/purchases/PurchaseForm.jsx';
@@ -64,6 +64,8 @@ export default function PurchasesPage() {
                 <Container className="d-flex flex-wrap align-items-center justify-content-between gap-2 py-3">
                     <span className="purchases-brand"><i className="bi bi-cup-hot" aria-hidden="true" /> Orígenes SV</span>
                     <div className="d-flex flex-wrap gap-3 align-items-center">
+                        <Link className="purchases-cash-link" to="/facturacion">Facturación</Link>
+                        <Link className="purchases-cash-link" to="/caja">Caja</Link>
                         <span>{employee.name}</span>
                         <Button outline color="light" size="sm" onClick={signOut}>Cerrar sesión</Button>
                     </div>
